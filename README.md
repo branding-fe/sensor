@@ -13,6 +13,13 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 
 #### Shake
 
+#### camera
+
+####canvas(img擦一擦等)
+
+####h5GPS
+
+####touch(Hammer?)  
 
 Quickstart
 ----------
