@@ -1,11 +1,11 @@
 
 # sensor.js
 
-智能机浏览器中通过HTML5使用手机的功能
+智能手机浏览器上，通过HTML5使用手机的功能
 
 概述
 --------
-HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的抽象的库。她可以让开发者通过简单的javascript快速使用这些功能，而不用去了解实现和屏蔽各种设备差异的细节。
+HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的抽象的库。可以让开发者通过简单的javascript api快速使用这些功能，而不用花大量时间在功能实现和屏蔽各种设备差异的细节上。
 
 实例
 ------
@@ -19,7 +19,7 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 
 ####h5GPS
 
-####touch(Hammer?)  
+####touch(Hammer?)
 
 Quickstart
 ----------
@@ -40,13 +40,13 @@ gammaThreshold| (number) Threshold for changes in gamma  | 0
 radians       | (boolean) True to emit values in radians | false
 
 
-Data          | Description                               
+Data          | Description
 ------------- | -----------------------------------------
-alpha         | (number) degree/radian value for direction the device is pointed 
+alpha         | (number) degree/radian value for direction the device is pointed
 beta          | (number) degree/radian value for device's front-back tilt
-gamma         | (number) degree/radian value for device's left-right tilt  
+gamma         | (number) degree/radian value for device's left-right tilt
 
-Sample Usage:
+用法
 ```javascript
 sense.orientation(function(data){
     console.log(data)
