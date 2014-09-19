@@ -3,22 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Mobile Sensors</title>
-    <link href="styles/style.css" rel="stylesheet" type="text/css" />
+    <style type="text/css" media="screen">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            padding: 50px;
+            font: 1em "Microsoft YaHei", Helvetica, Arial, sans-serif;
+            text-align: center;
+        }
+        h3 {
+            font: 8em "Microsoft YaHei", Helvetica, Arial, sans-serif;
+            margin-bottom: 20px;
+        }
+        h4 {
+            font: 2em "Montserrat", Helvetica, Arial, sans-serif;
+            color: #737373;
+            margin-bottom: 30px;
+        }
+        .js {
+            color: #f00;
+        }
+        a {
+            font-size: 1.2em;
+            color: #33b5e5;
+            line-height: 2em;
+        }
+    </style>
 </head>
 <body>
-
-<div class="title">
-sense.<span class="js">js</span>
-</div>
-
-<div class="subtitle">
-simple gestures for mobile web browsers
-</div>
-
+<h3>sensor.<span class="js">js</span></h3>
+<h4>智能手机浏览器上，通过HTML5使用手机的功能</h4>
 <div class="examples">
-<a href="/orientation">ORIENTATION</a>
-//
-<a href="/shake">SCROLL</a>
+    <a href="/examples/orientation.html">ORIENTATION</a><br />
+    <a href="/examples/shake.html">SHAKE</a><br />
 </div>
 <script type="text/javascript">
 require.config({
