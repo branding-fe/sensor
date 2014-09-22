@@ -28,29 +28,32 @@ Quickstart
 文档
 -------------
 
-### sensor.orientation([options], callback)
+### new Orientation(options).start();
 
-Orientation fires continuously, and emits alpha, beta, and gamma data from the device.
+Orientation会持续的取得手机的alpha, beta, gamma的值。
 
-Options       | Description                              | Default
+配置项        | 描述                                     | 默认值
 ------------- | -----------------------------------------|-----------
-alphaThreshold| (number) Threshold for changes in delta  | 0
-betaThreshold | (number) Threshold for changes in beta   | 0
-gammaThreshold| (number) Threshold for changes in gamma  | 0
-radians       | (boolean) True to emit values in radians | false
+alphaThreshold| (number) alpha改变触发回调的临界值       | 0
+betaThreshold | (number) beta 改变触发回调的临界值       | 0
+gammaThreshold| (number) gamma改变触发回调的临界值       | 0
+radians       | (boolean) 是否使用弧度值                 | false
 
 
-Data          | Description
+值            | 描述
 ------------- | -----------------------------------------
-alpha         | (number) degree/radian value for direction the device is pointed
-beta          | (number) degree/radian value for device's front-back tilt
-gamma         | (number) degree/radian value for device's left-right tilt
+alpha         | (number) 手机水平旋转的角度/弧度值
+beta          | (number) 手机前后倾斜的角度/弧度值
+gamma         | (number) 手机左右倾斜的角度/弧度值
 
 用法
 ```javascript
-sense.orientation(function(data){
-    console.log(data)
-});
+require(['oientation'], function(oientation) {
+    var ori = Orientation(function(data){
+        console.log(data)
+    });
+    ori.start();
+})
 ```
 
 

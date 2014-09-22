@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Orientation Example</title>
+    <script type="text/javascript" src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-8-2/esl.js"></script>
+    <style type="text/css" media="screen">
+        * {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        }
+        *, *:focus, *:active {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            outline: none;
+        }
+        html,body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<canvas id="ballcanvas">Your browser does not support the HTML5 canvas tag.</canvas>
+<script type="text/javascript" charset="utf-8">
+require.config({
+    baseUrl: '../src'
+});
+require(['orientation'], function(Orientation) {
+    var sense,
+        c = document.getElementById('ballcanvas'),
+        context = c.getContext('2d'),
+        radius = 30,
+        ballx = 50,
+        bally = 50,
+        velx = 0,
+        vely = 0,
+        gravity = 3000,
+        gamma = 0,
+        beta = 0,
+        bounceDamping = .4,
+        oldTime = new Date(),
+        width = window.innerWidth,
+        height = window.innerHeight;
+    c.height = height;
+    c.width = width;
+
+    function draw() {
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      context.fillStyle = '000000';
+      context.beginPath();
+      context.arc(ballx, bally, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    function frame() {
+      var time = new Date(),
+          elapsedTime = (time - oldTime)/1000.0;
+      velx += gravity * elapsedTime * Math.sin(gamma);
+      vely += gravity * elapsedTime * Math.sin(beta);
+      ballx += velx * elapsedTime;
+      bally += vely * elapsedTime;
+
+      if (ballx + radius > width) {
+        ballx = width - radius;
+        velx *= -bounceDamping;
+      }
+
+      if (ballx - radius < 0) {
+        ballx = radius;
+        velx *= -bounceDamping;
+      }
+
+      if (bally + radius > height) {
+        bally = height - radius;
+        vely *= -bounceDamping;
+      }
+
+      if (bally - radius < 0) {
+        bally = radius;
+        vely *= -bounceDamping;
+      }
+
+      draw();
+      oldTime = time;
+    }
+
+    setInterval(frame, 40);
+    var ori = new Orientation({
+        alphaThreshold: 365,
+        betaThreshold: 0.05,
+        gammaThreshold: 0.05,
+        radians: true,
+        callback: function(angle) {
+            gamma = angle.gamma,
+            beta = angle.beta;
+            console.log(angle);
+        }
+    });
+    ori.start();
+});
+</script>
+</body>
+</html>
