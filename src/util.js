@@ -2,14 +2,16 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-09-22 16:12]
+*     Last Modified       :     [2014-09-23 15:41]
 *     Description         :     工具类
 ********************************************************************************/
 
 define(function() {
     // 获得css属性的前缀
     function prefix(style) {
-        if (vender === '') return style;
+        if (vender === '') {
+            return style;
+        }
 
         style = style.charAt(0).toUpperCase() + style.substr(1);
         return vender + style;
@@ -17,10 +19,10 @@ define(function() {
 
     var dummyStyle = document.createElement('div').style;
     var vender = (function() {
-        var vendors = 't,webkitT,MozT,msT,OT'.split(','),
-            t,
-            i = 0,
-            l = vendors.length;
+        var vendors = 't,webkitT,MozT,msT,OT'.split(',');
+        var t;
+        var i = 0;
+        var l = vendors.length;
 
         for (; i < l; i++) {
             t = vendors[i] + 'ransform';
@@ -32,6 +34,10 @@ define(function() {
         return false;
     })();
 
+    /**
+     * @type {Object}
+     * 是否是firefox浏览器
+     */
     var isFirefox = /firefox/i.test(navigator.userAgent);
 
     /**

@@ -1,7 +1,7 @@
 
 # sensor.js
 
-智能手机浏览器上，通过HTML5使用手机的功能
+在智能设备浏览器上，通过HTML5的api使用移动设备的功能。
 
 概述
 --------
@@ -34,9 +34,11 @@ Orientation会持续的取得手机的alpha, beta, gamma的值。
 
 配置项        | 描述                                     | 默认值
 ------------- | -----------------------------------------|-----------
+callback      | (Function) 角度/弧度改变的回调函数       | 0
 alphaThreshold| (number) alpha改变触发回调的临界值       | 0
 betaThreshold | (number) beta 改变触发回调的临界值       | 0
 gammaThreshold| (number) gamma改变触发回调的临界值       | 0
+       | (boolean) 是否使用弧度值                 | false
 radians       | (boolean) 是否使用弧度值                 | false
 
 
@@ -49,6 +51,7 @@ gamma         | (number) 手机左右倾斜的角度/弧度值
 用法
 ```javascript
 require(['oientation'], function(oientation) {
+    // options为函数时就成为配置项的callback值
     var ori = Orientation(function(data){
         console.log(data)
     });
