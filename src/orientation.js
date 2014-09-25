@@ -2,7 +2,7 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-09-25 16:11]
+*     Last Modified       :     [2014-09-25 18:11]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
@@ -94,10 +94,9 @@ define(['./util'], function(util) {
         var timeDifference = currentTime.getTime() - this._lastOrientationTime.getTime();
         if (timeDifference > this._configs.timeInterval) {
             this._lastOrientationTime = new Date();
-            var alpha = util.isFirefox ? Math.round(-event.alpha) : Math.round(event.alpha),
-            var beta = util.isFirefox ? Math.round(-event.beta)  : Math.round(event.beta),
-            var gamma = util.isFirefox ? Math.round(-event.gamma) : Math.round(event.gamma)
-            };
+            var alpha = util.isFirefox ? Math.round(-event.alpha) : Math.round(event.alpha);
+            var beta = util.isFirefox ? Math.round(-event.beta)  : Math.round(event.beta);
+            var gamma = util.isFirefox ? Math.round(-event.gamma) : Math.round(event.gamma);
             if (this._configs.radians) {
                 alpha = alpha * Math.PI / 180.0;
                 beta  = beta  * Math.PI / 180.0;

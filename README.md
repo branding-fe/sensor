@@ -89,6 +89,6 @@ require(['shake'], function(Shake) {
 
 参考
 ------
-1, https://developer.mozilla.org/en-US/docs/tag/Sensors
-2, http://blog.csdn.net/hursing/article/details/9046837
-3, http://blog.csdn.net/hursing/article/details/9061991
+* https://developer.mozilla.org/en-US/docs/tag/Sensors
+* http://blog.csdn.net/hursing/article/details/9046837
+* http://blog.csdn.net/hursing/article/details/9061991
