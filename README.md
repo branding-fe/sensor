@@ -10,17 +10,20 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 
 实例
 ------
-#### [Orientation](http://dev046.baidu.com:8096/examples/orientation.html)
+这里: http://sensor.jishub.com 可以看到功能实例DEMO。
+#### 倾斜 Orientation
+你可以通过控制移动设备的倾斜控制页面上的球的滚动。
 
-#### [Shake](http://dev046.baidu.com:8096/examples/shake.html)
+#### 摇一摇 Shake
+通过摇晃移动设备改变页面的颜色。
 
 #### camera
 
-####canvas(img擦一擦等)
+#### canvas(img擦一擦等)
 
-####h5GPS
+#### GPS
 
-####touch(Hammer?)
+#### touch(Hammer?)
 
 
 文档
@@ -51,13 +54,41 @@ gamma         | (number) 移动设备左右倾斜的角度/弧度值
 //使用amd js加载工具
 require(['oientation'], function(Orientation) {
     // options为函数时就作为配置项的callback配置项
-    var ori = new Orientation(function(data){
-        console.log(data)
-    });
-    ori.start();
+    new Orientation(function(data){
+        //处理data...
+    }).start();
 })
 ```
 
 ### 摇一摇 Shake
 
-Shake会监听移动设备的摇晃动作。
+Shake会监听移动设备的摇晃动作，会返回触发事件时各个方向的加速度值(考虑重力加速度)。
+
+配置项        | 描述                                          | 默认值
+------------- | ----------------------------------------------|-----------
+callback      | (Function) 摇晃设备的回调函数                 | -
+threshold     | (number) 各个方向加速度值改变触发回调的临界值 | 10
+timeInterval  | (number) 判断加速度值变化的时间间隔(毫秒)     | 500
+
+
+返回值    | 描述
+------------- | -----------------------------------------
+x             | (number) x轴加速度(考虑重力加速度)
+y             | (number) y轴加速度(考虑重力加速度)
+z             | (number) z轴加速度(考虑重力加速度)
+
+用法
+```javascript
+//使用amd js加载工具
+require(['shake'], function(Shake) {
+    new Shake(function(data){
+        //处理data...
+    }).start();
+})
+```
+
+参考
+------
+1, https://developer.mozilla.org/en-US/docs/tag/Sensors
+2, http://blog.csdn.net/hursing/article/details/9046837
+3, http://blog.csdn.net/hursing/article/details/9061991

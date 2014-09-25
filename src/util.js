@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-09-23 15:41]
+*     Last Modified       :     [2014-09-25 16:12]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -41,6 +41,16 @@ define(function() {
     var isFirefox = /firefox/i.test(navigator.userAgent);
 
     /**
+     * @type {Function}
+     * @param {*} object 需要判断的对象
+     * @return {boolean}
+     * 判断输入对象是否是函数
+     */
+    var isFunction = function (object) {
+        return ('[object Function]' === Object.prototype.toString.call(object));
+    };
+
+    /**
      * 将源对象的所有属性拷贝到目标对象中
      * 1.目标对象中，与源对象key相同的成员默认将会被覆盖。
      * 2.源对象的prototype成员不会拷贝。
@@ -63,6 +73,7 @@ define(function() {
     return {
         setCssPrefix: prefix,
         isFirefox: isFirefox,
+        isFunction: isFunction,
         extend: extend
     };
 });

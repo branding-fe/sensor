@@ -21,14 +21,14 @@
     </style>
 </head>
 <body>
-<canvas id="ballcanvas">Your browser does not support the HTML5 canvas tag.</canvas>
+<canvas id="ball">Your browser does not support the HTML5 canvas tag.</canvas>
 <script type="text/javascript" charset="utf-8">
 require.config({
     baseUrl: '../src'
 });
 require(['orientation'], function(Orientation) {
     var sense,
-        c = document.getElementById('ballcanvas'),
+        c = document.getElementById('ball'),
         context = c.getContext('2d'),
         radius = 30,
         ballx = 50,
@@ -86,7 +86,8 @@ require(['orientation'], function(Orientation) {
     }
 
     setInterval(frame, 40);
-    var ori = new Orientation({
+
+    new Orientation({
         alphaThreshold: 365,
         betaThreshold: 0.05,
         gammaThreshold: 0.05,
@@ -94,10 +95,9 @@ require(['orientation'], function(Orientation) {
         callback: function(angle) {
             gamma = angle.gamma,
             beta = angle.beta;
-            console.log(angle);
+            console.dir(this);
         }
-    });
-    ori.start();
+    }).start();
 });
 </script>
 </body>
