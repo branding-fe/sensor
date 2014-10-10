@@ -17,11 +17,12 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 #### 摇一摇 Shake
 通过摇晃移动设备改变页面的颜色。
 
+#### Geolocation
+获取你当前的经纬度，打开百度地图显示当前的位置。需要手动确认开启位置检测。
+
 #### camera
 
 #### canvas(img擦一擦等)
-
-#### GPS
 
 #### touch(Hammer?)
 
@@ -49,7 +50,7 @@ alpha         | (number) 移动设备水平旋转的角度/弧度值
 beta          | (number) 移动设备前后倾斜的角度/弧度值
 gamma         | (number) 移动设备左右倾斜的角度/弧度值
 
-用法
+用法:
 ```javascript
 //使用amd js加载工具
 require(['oientation'], function(Orientation) {
@@ -71,13 +72,13 @@ threshold     | (number) 各个方向加速度值改变触发回调的临界值 
 timeInterval  | (number) 判断加速度值变化的时间间隔(毫秒)     | 500
 
 
-返回值    | 描述
+返回值        | 描述
 ------------- | -----------------------------------------
 x             | (number) x轴加速度(考虑重力加速度)
 y             | (number) y轴加速度(考虑重力加速度)
 z             | (number) z轴加速度(考虑重力加速度)
 
-用法
+用法:
 ```javascript
 //使用amd js加载工具
 require(['shake'], function(Shake) {
@@ -87,8 +88,14 @@ require(['shake'], function(Shake) {
 })
 ```
 
+
+### 定位 GPS
+
+
+
 参考
 ------
 * https://developer.mozilla.org/en-US/docs/tag/Sensors
 * http://blog.csdn.net/hursing/article/details/9046837
 * http://blog.csdn.net/hursing/article/details/9061991
+* http://www.w3schools.com/html/html5_geolocation.asp
