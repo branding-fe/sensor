@@ -28,7 +28,7 @@ require(['geolocation'], function(Shake) {
     var x = document.getElementById("geo");
     var determining = true;
     var dotNum = 0;
-    setInterval(function() {
+    var interV = setInterval(function() {
         if (determining) {
             dotNum = (dotNum + 1) % 4;
             var i = dotNum;
@@ -43,14 +43,17 @@ require(['geolocation'], function(Shake) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
         } else {
+            clearInterval(interV);
             x.innerHTML = "Geolocation is not supported by this browser.";
         }
     }
     function showPosition(position) {
+        clearInterval(interV);
         x.innerHTML = "Latitude: " + position.coords.latitude +
         "<br>Longitude: " + position.coords.longitude;
     }
     function showError(error) {
+        clearInterval(interV);
         switch(error.code) {
             case error.PERMISSION_DENIED:
                 x.innerHTML = "User denied the request for Geolocation."
