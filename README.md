@@ -91,6 +91,34 @@ require(['shake'], function(Shake) {
 
 ### 定位 GPS
 
+获取用户设备GPS定位经纬度。
+
+配置项        | 描述                                                 | 默认值
+------------- | -----------------------------------------------------|-----------
+callback      | (Function) 获取到经纬度或转换过的经纬度后的回调函数  | -
+
+
+返回值          | 描述
+--------------- | -----------------------------------------
+errorMessage    | (string) 如果定位没有成功，提示错误信息
+latitude        | (number) 纬度值
+longitude       | (number) 经度值
+accuracy        | (number) 定位精度
+altitude        | (number) 相对于海平面的海拔高度
+altitudeAccuracy| (number) 海拔精度
+heading         | (number) 方向，从正北开始以度计
+speed           | (number) 速度，以米/每秒计
+timestamp       | (number) 响应的日期/时间
+
+用法:
+```javascript
+//使用amd js加载工具
+require(['geolocation'], function(Shake) {
+    new Geolocation(function(data){
+        //处理data...
+    }).start();
+})
+```
 
 
 参考
