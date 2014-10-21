@@ -21,6 +21,7 @@
             left: 10px;
             color: #fff;
             text-shadow: 1px 1px 1px #111;
+            font-size: 12px;
         }
         #map {
             width: 100%;
@@ -37,8 +38,8 @@
 require.config({
     baseUrl: '../src'
 });
-require(['geolocation'], function(Shake) {
-    var x = document.getElementById("geo");
+require(['geolocation', 'x'], function(Geo, X) {
+    var geoDom = document.getElementById("geo");
     var vpW = document.documentElement.offsetWidth;
     var vpH = document.documentElement.offsetHeight;
 
@@ -52,49 +53,36 @@ require(['geolocation'], function(Shake) {
             while (i--) {
                 wStr += '.';
             }
-            x.innerHTML = wStr;
+            geoDom.innerHTML = wStr;
         }
     }, 500);
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-        } else {
-            clearInterval(interV);
-            x.innerHTML = "Geolocation is not supported by this browser.";
-        }
-    }
-    function showPosition(position) {
+    new Geo(function(pos) {
         clearInterval(interV);
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-        x.innerHTML = "Latitude: " + lat +
-        "<br>Longitude: " + lon;
-        showMap(lon, lat, vpW, vpH);
-    }
+        if (pos.errorMessage) {
+            geoDom.innerHTML = pos.errorMessage;
+        }
+        else {
+            var lat = pos.latitude;
+            var lon = pos.longitude;
+            geoDom.innerHTML = "Latitude: " + lat +
+            "<br>Longitude: " + lon;
+            var x = new X();
+            x.onLoad = function (data) {
+                var data = x.response;
+                geoDom.innerHTML = geoDom.innerHTML + '<br />' + JSON.stringify(data, null, 4);
+                data.result && data.result.length > 0 && showMap(data.result[0].x, data.result[0].y, vpW, vpH);
+            };
+            // 由百度位置api把GPS坐标换算成百度坐标
+            x.jsonp('http://api.map.baidu.com/geoconv/v1/?coords=' + lon + ',' + lat + '&ak=V1dax1IPqCc2GLoZkDHabcck&callback=?');
+        }
+    }).start();
+
     function showMap(lon, lat, width, height) {
         var url = "http://api.map.baidu.com/staticimage?center=" + lon + "," + lat + "&width=" + width + "&height=" + height + "&zoom=17"
         var img = document.createElement('img');
         img.src = url;
         document.getElementById('map').appendChild(img);
     }
-    function showError(error) {
-        clearInterval(interV);
-        switch(error.code) {
-            case error.PERMISSION_DENIED:
-                x.innerHTML = "User denied the request for Geolocation."
-                break;
-            case error.POSITION_UNAVAILABLE:
-                x.innerHTML = "Location information is unavailable."
-                break;
-            case error.TIMEOUT:
-                x.innerHTML = "The request to get user location timed out."
-                break;
-            case error.UNKNOWN_ERROR:
-                x.innerHTML = "An unknown error occurred."
-                break;
-        }
-    }
-    getLocation();
 });
 </script>
 </body>

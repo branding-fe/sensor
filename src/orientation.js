@@ -2,12 +2,12 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-09-25 18:11]
+*     Last Modified       :     [2014-10-21 10:46]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
 
-define(['./util'], function(util) {
+nefine(['./util'], function(util) {
     /**
      * @constructor
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
