@@ -1,4 +1,3 @@
-
 # sensor.js
 
 在智能移动设备浏览器上，通过HTML5的api使用移动设备的功能。
@@ -11,6 +10,7 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 实例
 ------
 这里: http://sensor.jishub.com 可以看到功能实例DEMO。
+
 #### 倾斜 Orientation
 你可以通过控制移动设备的倾斜控制页面上的球的滚动。
 
@@ -20,9 +20,9 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 #### Geolocation
 获取你当前的经纬度，打开百度地图显示当前的位置。需要手动确认开启位置检测。
 
-#### camera
-
 #### canvas(img擦一擦等)
+
+#### camera
 
 #### touch(Hammer?)
 
@@ -93,10 +93,9 @@ require(['shake'], function(Shake) {
 
 获取用户设备GPS定位经纬度。
 
-配置项        | 描述                                                 | 默认值
-------------- | -----------------------------------------------------|-----------
-callback      | (Function) 获取到经纬度或转换过的经纬度后的回调函数  | -
-
+配置项          | 描述                                                 | 默认值
+--------------- | -----------------------------------------------------|-----------
+callback        | (Function) 获取到经纬度或转换过的经纬度后的回调函数  | -
 
 返回值          | 描述
 --------------- | -----------------------------------------
@@ -113,7 +112,7 @@ timestamp       | (number) 响应的日期/时间
 用法:
 ```javascript
 //使用amd js加载工具
-require(['geolocation'], function(Shake) {
+require(['geolocation'], function(Geolocation) {
     new Geolocation(function(data){
         //处理data...
     }).start();
