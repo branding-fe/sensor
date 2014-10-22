@@ -17,10 +17,11 @@ HTML5提供了很多对硬件的使用功能。sensor.js是使用这些功能的
 #### 摇一摇 Shake
 通过摇晃移动设备改变页面的颜色。
 
-#### Geolocation
+#### 定位 Geolocation
 获取你当前的经纬度，打开百度地图显示当前的位置。需要手动确认开启位置检测。
 
-#### canvas(img擦一擦等)
+#### 擦一擦 ErasableMask
+把某个元素使用可擦除的遮罩遮住，手指擦除遮罩面积达到或超过百分之40就清除全部遮罩。
 
 #### camera
 
@@ -117,6 +118,60 @@ require(['geolocation'], function(Geolocation) {
         //处理data...
     }).start();
 })
+```
+
+
+### 可擦除遮罩 ErasableMask
+
+给元素添加可擦除的遮罩。
+
+配置项          | 描述                                                        | 默认值
+--------------- | -------------------------------------------------------------------------------|-----------
+el              | (Element|string) 需要遮罩的DOM节点 或 节点的id                                 | -
+callback        | (Function) 擦除一部分后的回调函数，函数会接收到擦除的百分比                    | -
+image           | (string) 用于遮罩的图片 默认不用图片                                           | -
+width           | (number) 遮罩宽度 默认为被遮罩的元素宽度                                       | -
+height          | (number) 遮罩高度 默认为被遮罩的元素高度                                       | -
+left            | (number) 遮罩style的left值 遮罩为绝对定位                                      | 0
+top             | (number) 遮罩style的top值 遮罩为绝对定位                                       | 0
+color           | (string) 遮罩层颜色 默认使用背景颜色为#666的遮罩                               | #666
+transparent     | (number) 遮罩的透明度 默认不透明                                               | 100
+checkDistance   | (number) 用于计算擦除部分的比例的计算点之间的间距，越小越精确，而执行效率越低  | 20
+showPoint       | (boolean) 显示计算点，一般在测试的时候才用                                     | false
+
+
+返回值          | 描述
+--------------- | -----------------------------------------
+percent         | (number) 擦除的面积占整个遮罩的百分比
+
+用法:
+```javascript
+//使用amd js加载工具
+require(['erasableMask'], function(Mask) {
+    var bodyStyle = document.body.style;
+    // 禁止浏览器默认选中
+    bodyStyle.mozUserSelect = 'none';
+    bodyStyle.webkitUserSelect = 'none';
+
+    var perStr;
+    var mask = new Mask('imgWrap', {
+        width: 500,
+        height: 400,
+        maskImage: '../images/pet2.jpg',
+        showPoint: true,
+        callback: function(percent) {
+            perStr = '擦除百分比为：' + Math.floor(percent) + '%';
+            console.log(perStr);
+            if (percent >= 40) {
+                mask.clearMask();
+                mask.stop();
+            }
+        }
+    });
+    mask.start();
+
+})();
+
 ```
 
 

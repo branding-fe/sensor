@@ -2,156 +2,70 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-10-21 18:14]
+*     Last Modified       :     [2014-10-22 17:40]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
 <!doctype html>
 <html lang="zh-cn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-<title>html5 canvas</title>
-<style>
-body {
-    position: relative;
-    padding-top: 500px;
-}
-#lamp {
-    position: absolute;
-    z-index: -1;
-    top: -1000px;
-}
-.canvas01 {
-    position: absolute;
-    top: 0;
-}
-.canvas02 {
-    width: 200px;
-    height: 200px;
-    background: url(../images/pet.jpg) #666;
-}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Erasable Mask</title>
+    <script type="text/javascript" src="../src/require.js"></script>
+    <style>
+    body {
+        position: relative;
+    }
+    #imgWrap {
+        width: 500px;
+        height: 350px;
+        position: relative;
+    }
+    #percentDom {
+        position: absolute;
+        bottom: 0;
+        left: 5px;
+        color: #111;
+        font-size: 14px;
+    }
+    </style>
 </head>
 <body>
-<img id="lamp" src="../images/pet2.jpg" />
-<canvas class="canvas01"></canvas>
-<!--<canvas class="canvas02"></canvas>-->
+<div id="imgWrap">
+    <img src="../images/pet.jpg" />
+    <div id="percentDom"></div>
+</div>
 <script>
-(function(bodyStyle) {
+require.config({
+    baseUrl: '../src'
+});
+require(['erasableMask'], function(Mask) {
+    var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
 
-    var img = new Image();
-    var canvas = document.querySelector('.canvas01');
-    canvas.style.backgroundColor='transparent';
-    canvas.style.position = 'absolute';
 
-    function getColor(img, x, y) {
-        var offset = (x + y * img.width) * 4;
-        var red = img.data[offset];
-        var green = img.data[offset + 1];
-        var blue = img.data[offset + 2];
-        var alpha = img.data[offset + 3];
-        return [red, green, blue, alpha]
-    }
-
-    img.addEventListener('load', function(e) {
-        var ctx;
-        var w = img.width,
-        h = img.height;
-        var offsetX = canvas.offsetLeft,
-        offsetY = canvas.offsetTop;
-        var mousedown = false;
-        function checkTransparentPercent(init) {
-            var img = ctx.getImageData(0, 0, w, h);
-            var transparentPoints = 0;
-            var curX;
-            var curY;
-            var curColor;
-            var stepX = w/20;
-            var stepY = h/20;
-            var alArr = [];
-            var transCount = 0;
-            for (var i = 0; i < 20; i++) {
-                for (var j = 0; j < 20; j++) {
-                    curX = parseInt(stepX/2 + i * stepX);
-                    curY = parseInt(stepY/2 + j * stepY);
-                    curColor = getColor(img, curX, curY);
-                    alArr.push(curColor[3]);
-                    if (0 === curColor[3]) {
-                        transCount ++;
-                    }
-                    if (init) {
-                        ctx.beginPath();
-                        ctx.moveTo(curX, curY);
-                        ctx.lineTo(curX, curY + 1);
-                        ctx.closePath();
-                        ctx.stroke();
-                    }
-                }
-            }
-            //console.log(alArr.join('] - ['));
-            console.log(transCount / 400);
-        }
-
-        function layer(ctx) {
-
-            var img=document.getElementById("lamp");
-            var pat=ctx.createPattern(img,"repeat");
-
-            ctx.fillStyle = pat;
-            ctx.fillRect(0, 0, w, h);
-            checkTransparentPercent(true);
-        }
-
-        function eventDown(e){
-            e.preventDefault();
-            mousedown=true;
-        }
-
-        function eventUp(e){
-            checkTransparentPercent();
-            e.preventDefault();
-            mousedown=false;
-        }
-
-        function eventMove(e) {
-            e.preventDefault();
-            if(mousedown) {
-                if(e.changedTouches){
-                    e=e.changedTouches[e.changedTouches.length-1];
-                }
-                var x = (e.clientX + document.body.scrollLeft || e.pageX) - offsetX || 0,
-                y = (e.clientY + document.body.scrollTop || e.pageY) - offsetY || 0;
-                with(ctx) {
-                    beginPath()
-                    arc(x, y, 20, 0, Math.PI * 2);
-                    fill();
-                }
+    var perStr;
+    var perDom = document.getElementById('percentDom');
+    var mask = new Mask('imgWrap', {
+        width: 500,
+        height: 332,
+        maskImage: '../images/pet2.jpg',
+        showPoint: true,
+        callback: function(percent) {
+            perStr = '擦除百分比为：' + Math.floor(percent) + '%';
+            perDom.innerHTML = perStr;
+            if (percent >= 40) {
+                mask.clearMask();
+                mask.stop();
+                perDom.innerHTML = '已清除全部遮罩';
             }
         }
-
-        canvas.width=w;
-        canvas.height=h;
-        canvas.style.backgroundImage='url('+img.src+')';
-        ctx=canvas.getContext('2d');
-        ctx.fillStyle='transparent';
-        ctx.fillRect(0, 0, w, h);
-        layer(ctx);
-
-        ctx.globalCompositeOperation = 'destination-out';
-
-        canvas.addEventListener('touchstart', eventDown);
-        canvas.addEventListener('touchend', eventUp);
-        canvas.addEventListener('touchmove', eventMove);
-        canvas.addEventListener('mousedown', eventDown);
-        canvas.addEventListener('mouseup', eventUp);
-        canvas.addEventListener('mousemove', eventMove);
     });
-    img.src = '../images/pet.jpg';
+    mask.start();
 
-})(document.body.style);
+})();
 </script>
 </body>
 </html>

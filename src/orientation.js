@@ -2,7 +2,7 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-10-21 10:46]
+*     Last Modified       :     [2014-10-22 17:17]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
@@ -11,6 +11,7 @@ nefine(['./util'], function(util) {
     /**
      * @constructor
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
+     * @param {Function=} opt_options.callback 获取倾斜值的回调函数
      * @param {number=} opt_options.alphaThreshold 水平旋转alpha值改变触发回调的临界值
      * @param {number=} opt_options.betaThreshold  前后倾斜beta 值改变触发回调的临界值
      * @param {number=} opt_options.gammaThreshold 左右倾斜gamma值改变触发回调的临界值

@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-09-25 17:54]
+*     Last Modified       :     [2014-10-22 14:35]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -52,6 +52,7 @@ define(['util'], function(util) {
     /**
      * 设置响应加速度改变的回调函数
      * @param {Function} fn 回调函数
+     * @return this 用于链式调用
      */
     Shake.prototype.setCallback = function(fn) {
         this._configs.callback = fn;
@@ -74,7 +75,9 @@ define(['util'], function(util) {
         }
     };
 
-    // 停止检测手机加速度
+    /** 停止检测手机加速度
+     * @return this 用于链式调用
+     */
     Shake.prototype.stop = function () {
         if (this._hasDeviceMotion) {
             window.removeEventListener('devicemotion', this, false);
@@ -137,5 +140,6 @@ define(['util'], function(util) {
             return this[event.type](event);
         }
     };
+
     return Shake;
 });

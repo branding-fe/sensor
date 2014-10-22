@@ -2,7 +2,7 @@
 *     File Name           :     src/geolocation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-10 17:49]
-*     Last Modified       :     [2014-10-21 13:19]
+*     Last Modified       :     [2014-10-22 17:18]
 *     Description         :     地理位置获取接口
 ********************************************************************************/
 
@@ -11,6 +11,7 @@ define(['./util'], function(util) {
     /**
      * @constructor
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
+     * @param {Function=} opt_options.callback 获取位置信息的回调函数
      */
     function Geolocation(opt_options) {
         /**
@@ -47,6 +48,7 @@ define(['./util'], function(util) {
     /**
      * 设置获取到经纬度的回调函数
      * @param {Function} fn 回调函数
+     * @return this 用于链式调用
      */
     Geolocation.prototype.setCallback = function(fn) {
         this.callback = fn;
