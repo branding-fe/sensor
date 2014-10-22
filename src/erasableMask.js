@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-10-22 17:35]
+*     Last Modified       :     [2014-10-22 17:56]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -264,7 +264,6 @@ define(['util'], function(util) {
                     transCount ++;
                 }
                 if (showPoint) { // 显示用于计算的点，用于测试
-                    ctx.strokeStyle = "#000";
                     ctx.beginPath();
                     ctx.moveTo(curX, curY);
                     ctx.lineTo(curX, curY + 1);

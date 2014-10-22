@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-10-22 17:40]
+*     Last Modified       :     [2014-10-22 17:56]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -52,7 +52,7 @@ require(['erasableMask'], function(Mask) {
         width: 500,
         height: 332,
         maskImage: '../images/pet2.jpg',
-        showPoint: true,
+        showPoint: false,
         callback: function(percent) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';
             perDom.innerHTML = perStr;

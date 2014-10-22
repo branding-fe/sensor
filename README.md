@@ -158,7 +158,7 @@ require(['erasableMask'], function(Mask) {
         width: 500,
         height: 400,
         maskImage: '../images/pet2.jpg',
-        showPoint: true,
+        showPoint: false,
         callback: function(percent) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';
             console.log(perStr);
