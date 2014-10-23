@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-10-22 17:56]
+*     Last Modified       :     [2014-10-23 11:01]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -23,9 +23,7 @@ define(['util'], function(util) {
      * @param {boolean=} opt_options.showPoint 显示计算点，默认false
      */
     function ErasableMask(el, opt_options) {
-        if ('[object String]' === Object.prototype.toString.call(el)) {
-            el = document.getElementById(el);
-        }
+        var el = util.getElement(el);
         if (!el) {
             alert('必须要配置使用遮罩的DOM节点。');
             return;
@@ -100,12 +98,10 @@ define(['util'], function(util) {
         var mDom = this.maskedDom;
         var configs = this._configs;
 
-        var width = configs.width ?
-                    configs.width :
-                    mDom.offsetWidth - mDom.clientLeft - parseInt(getComputedStyle(mDom).borderRight);
-        var height = configs.height ?
-                    configs.height :
-                    mDom.offsetHeight - mDom.clientTop - parseInt(getComputedStyle(mDom).borderBottom);
+        var width = configs.width ? configs.width :
+                    mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRight);
+        var height = configs.height ? configs.height :
+                     mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottom);
 
         this.maskCanvas.width = width;
         this.maskCanvas.height = height;
@@ -121,7 +117,7 @@ define(['util'], function(util) {
             img.style.display = 'none';
             document.body && document.body.appendChild(img);
             img.addEventListener('load', function() {
-                var pat = ctx.createPattern(img, "repeat");
+                var pat = ctx.createPattern(img, 'repeat');
                 ctx.fillStyle = pat;
                 ctx.fillRect(0, 0, width, height);
                 ctx.globalCompositeOperation = 'destination-out';
@@ -169,7 +165,7 @@ define(['util'], function(util) {
      * @return {Function} 处理事件的函数
      */
     ErasableMask.prototype.handleEvent = function(event) {
-        switch(event.type) {
+        switch (event.type) {
             case startEvent:
                 return this.startErase(event);
             case moveEvent:
@@ -196,18 +192,16 @@ define(['util'], function(util) {
      */
     ErasableMask.prototype.doErase = function (e) {
         e.preventDefault();
-        if(this._startedErase) {
-            if(e.changedTouches){
+        if (this._startedErase) {
+            if (e.changedTouches) {
                 e = e.changedTouches[e.changedTouches.length - 1];
             }
             var x = (e.clientX + document.body.scrollLeft || e.pageX) - this._offsetX || 0;
             var y = (e.clientY + document.body.scrollTop || e.pageY) - this._offsetY || 0;
             var ctx = this.maskCanvas.getContext('2d');
-            with(ctx) {
-                beginPath();
-                arc(x , y, 20, 0, Math.PI * 2);
-                fill();
-            }
+            ctx.beginPath();
+            ctx.arc(x , y, 20, 0, Math.PI * 2);
+            ctx.fill();
         }
     };
 
@@ -235,7 +229,6 @@ define(['util'], function(util) {
         var canvasH = this.maskCanvas.height;
         var ctx = this.maskCanvas.getContext('2d');
         var img = ctx.getImageData(0, 0, canvasW, canvasH);
-        var transparentPoints = 0;
         var curX;
         var curY;
         var curColor;
@@ -250,18 +243,18 @@ define(['util'], function(util) {
                     curX = canvasW / 2 + (xPoints - 1) * step / 2;
                 }
                 else {
-                    curX = parseInt(step/2 + i * step);
+                    curX = window.parseInt(step / 2 + i * step);
                 }
                 if (j === yPoints - 1) {
                     curY = canvasH / 2 + (yPoints - 1) * step / 2;
                 }
                 else {
-                    curY = parseInt(step/2 + j * step);
+                    curY = window.parseInt(step / 2 + j * step);
                 }
 
                 curColor = this.getColorValue(img, curX, curY);
                 if (0 === curColor[3]) {
-                    transCount ++;
+                    transCount++;
                 }
                 if (showPoint) { // 显示用于计算的点，用于测试
                     ctx.beginPath();
@@ -285,7 +278,7 @@ define(['util'], function(util) {
         var green = img.data[offset + 1];
         var blue = img.data[offset + 2];
         var alpha = img.data[offset + 3];
-        return [red, green, blue, alpha]
+        return [red, green, blue, alpha];
     };
 
     /*

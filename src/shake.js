@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-10-22 14:35]
+*     Last Modified       :     [2014-10-23 11:02]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -100,7 +100,8 @@ define(['util'], function(util) {
         var deltaY = 0;
         var deltaZ = 0;
 
-        if ((this._prevAcceleration.x === null) && (this._prevAcceleration.y === null) && (this._prevAcceleration.z === null)) {
+        if ((this._prevAcceleration.x === null) && (this._prevAcceleration.y === null) &&
+            (this._prevAcceleration.z === null)) {
             this._prevAcceleration.x = current.x;
             this._prevAcceleration.y = current.y;
             this._prevAcceleration.z = current.z;
@@ -111,7 +112,8 @@ define(['util'], function(util) {
         deltaY = Math.abs(this._prevAcceleration.y - current.y);
         deltaZ = Math.abs(this._prevAcceleration.z - current.z);
 
-        var isShake = (deltaX > this._configs.threshold) || (deltaY > this._configs.threshold) || (deltaZ > this._configs.threshold);
+        var isShake = (deltaX > this._configs.threshold) || (deltaY > this._configs.threshold) ||
+            (deltaZ > this._configs.threshold);
         if (isShake) {
             if (timeDifference > this._configs.timeInterval) {
                 this._lastTime = new Date();

@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-09-25 16:12]
+*     Last Modified       :     [2014-10-23 10:49]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -40,6 +40,8 @@ define(function() {
      */
     var isFirefox = /firefox/i.test(navigator.userAgent);
 
+    var _toString = Object.prototype.toString;
+
     /**
      * @type {Function}
      * @param {*} object 需要判断的对象
@@ -47,7 +49,40 @@ define(function() {
      * 判断输入对象是否是函数
      */
     var isFunction = function (object) {
-        return ('[object Function]' === Object.prototype.toString.call(object));
+        return ('[object Function]' === _toString.call(object));
+    };
+
+    /**
+     * @type {Function}
+     * @param {*} object 需要判断的对象
+     * @return {boolean}
+     * 判断输入对象是否是字符串
+     */
+    var isString = function (object) {
+        return ('[object String]' === _toString.call(object));
+    };
+
+    /**
+     * @type {Function}
+     * @param {*} object 需要判断的对象
+     * @return {boolean}
+     * 判断输入对象是否是数组
+     */
+    var isArray = function (object) {
+        return ('[object Array]' === _toString.call(object));
+    };
+
+    /**
+     * @type {Function}
+     * @param {*} object 传入的DOM相关的内容
+     * @return {boolean}
+     * 根据输入内容返回DOM元素，传入字符串就作为DOM的id，传入DOM元素返回本身
+     */
+    var getElement = function (object) {
+        if (isString(object)) {
+            return document.getElementById(object);
+        }
+        return object;
     };
 
     /**
@@ -74,6 +109,9 @@ define(function() {
         setCssPrefix: prefix,
         isFirefox: isFirefox,
         isFunction: isFunction,
+        isString: isString,
+        isArray: isArray,
+        getElement: getElement,
         extend: extend
     };
 });
