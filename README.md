@@ -131,7 +131,7 @@ require(['geolocation'], function(Geolocation) {
 
 配置项          | 描述                                                                           | 默认值
 --------------- | -------------------------------------------------------------------------------|-----------
-el              | (Element|string) 需要遮罩的DOM节点 或 节点的id                                 | -
+el              | (Element,string) 需要遮罩的DOM节点 或 节点的id                                 | -
 callback        | (Function) 擦除一部分后的回调函数，函数会接收到擦除的百分比                    | -
 image           | (string) 用于遮罩的图片 默认不用图片                                           | -
 width           | (number) 遮罩宽度                                                              | 被遮罩的元素宽度(不包括border)
