@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-10-23 11:02]
+*     Last Modified       :     [2014-10-23 17:30]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -41,7 +41,7 @@ define(['util'], function(util) {
             z: null
         };
 
-        if ('function' === typeof opt_options) {
+        if (util.isFunction(opt_options)) {
             this.setCallback(opt_options);
         }
         else {
@@ -138,7 +138,7 @@ define(['util'], function(util) {
      * @return {Function} 处理事件的函数
      */
     Shake.prototype.handleEvent = function (event) {
-        if (typeof (this[event.type]) === 'function') {
+        if (util.isFunction(this[event.type])) {
             return this[event.type](event);
         }
     };

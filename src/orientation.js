@@ -2,7 +2,7 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-10-23 09:51]
+*     Last Modified       :     [2014-10-23 17:31]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
@@ -48,7 +48,7 @@ define(['./util'], function(util) {
             gamma: 0
         };
 
-        if ('function' === typeof opt_options) {
+        if (util.isFunction(opt_options)) {
             this.setCallback(opt_options);
         }
         else {
@@ -128,7 +128,7 @@ define(['./util'], function(util) {
      * @return {Function} 处理事件的函数
      */
     Orientation.prototype.handleEvent = function(event) {
-        if ('function' === typeof (this[event.type])) {
+        if (util.isFunction(this[event.type])) {
             return this[event.type](event);
         }
     };

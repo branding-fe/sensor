@@ -2,7 +2,7 @@
 *     File Name           :     src/geolocation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-10 17:49]
-*     Last Modified       :     [2014-10-22 17:18]
+*     Last Modified       :     [2014-10-23 17:31]
 *     Description         :     地理位置获取接口
 ********************************************************************************/
 
@@ -20,7 +20,7 @@ define(['./util'], function(util) {
          */
         this._configs = {};
 
-        if ('function' === typeof opt_options) {
+        if (util.isFunction(opt_options)) {
             this.setCallback(opt_options);
         }
         else {
