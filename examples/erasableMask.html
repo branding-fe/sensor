@@ -1,0 +1,80 @@
+<!--******************************************************************************
+*     File Name           :     erasableMask.html
+*     Created By          :     DestinyXie
+*     Creation Date       :     [2014-10-21 15:50]
+*     Last Modified       :     [2014-10-27 15:53]
+*     Description         :     rub part of mask
+*******************************************************************************-->
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Erasable Mask</title>
+    <script type="text/javascript" src="../src/require.js"></script>
+    <style>
+    #outerWrap {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid #555;
+    }
+    #imgWrap {
+        width: 500px;
+        height: 350px;
+        position: relative;
+        margin: 5px;
+    }
+    #percentDom {
+        position: absolute;
+        bottom: 0;
+        left: 5px;
+        color: #111;
+        font-size: 14px;
+    }
+    </style>
+</head>
+<body>
+<div id="outerWrap">
+<div id="imgWrap">
+    <img src="../images/pet.jpg" />
+    <div id="percentDom"></div>
+</div>
+</div>
+<script>
+require.config({
+    baseUrl: '../src'
+});
+require(['erasableMask'], function(Mask) {
+    var bodyStyle = document.body.style;
+    bodyStyle.mozUserSelect = 'none';
+    bodyStyle.webkitUserSelect = 'none';
+
+
+    var perStr;
+    var perDom = document.getElementById('percentDom');
+    var mask = new Mask('imgWrap', {
+        width: 500,
+        height: 332,
+        alphaRadius: 5,
+        maskImage: '../images/pet2.jpg',
+        showPoint: true,
+        callback: function(percent) {
+            perStr = '擦除百分比为：' + Math.floor(percent) + '%';
+            perDom.innerHTML = perStr;
+            if (percent >= 40) {
+                mask.clearMask();
+                mask.stop();
+                perDom.innerHTML = '已清除全部遮罩';
+            }
+        }
+    });
+    mask.start();
+
+})();
+</script>
+</body>
+</html>
