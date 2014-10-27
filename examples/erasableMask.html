@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-10-22 17:56]
+*     Last Modified       :     [2014-10-27 15:53]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -14,13 +14,19 @@
     <title>Erasable Mask</title>
     <script type="text/javascript" src="../src/require.js"></script>
     <style>
-    body {
-        position: relative;
+    #outerWrap {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid #555;
     }
     #imgWrap {
         width: 500px;
         height: 350px;
         position: relative;
+        margin: 5px;
     }
     #percentDom {
         position: absolute;
@@ -32,9 +38,11 @@
     </style>
 </head>
 <body>
+<div id="outerWrap">
 <div id="imgWrap">
     <img src="../images/pet.jpg" />
     <div id="percentDom"></div>
+</div>
 </div>
 <script>
 require.config({
@@ -51,8 +59,9 @@ require(['erasableMask'], function(Mask) {
     var mask = new Mask('imgWrap', {
         width: 500,
         height: 332,
+        alphaRadius: 5,
         maskImage: '../images/pet2.jpg',
-        showPoint: false,
+        showPoint: true,
         callback: function(percent) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';
             perDom.innerHTML = perStr;

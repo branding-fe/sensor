@@ -139,9 +139,11 @@ height          | (number) 遮罩高度                                         
 left            | (number) 遮罩style的left值 遮罩为绝对定位                                      | 0
 top             | (number) 遮罩style的top值 遮罩为绝对定位                                       | 0
 color           | (string) 遮罩层颜色 默认使用背景颜色为#666的遮罩                               | #666
-transparent     | (number) 遮罩的透明度 默认不透明                                               | 100
+alpha           | (number) 遮罩的透明度 默认不透明                                               | 100
 checkDistance   | (number) 用于计算擦除部分的比例的计算点之间的间距，越小越精确，而执行效率越低  | 20
 showPoint       | (boolean) 显示计算点，一般在测试的时候才用                                     | false
+radius          | (number) 擦除半径大小                                                          | 20
+alphaRadius     | (number) 擦除外边缘半透明渐变距离(注: 在计算擦除面积时只算完全擦除的)          | 10
 
 
 返回值                      | 描述
@@ -185,3 +187,5 @@ require(['erasableMask'], function(Mask) {
 * http://blog.csdn.net/hursing/article/details/9046837
 * http://blog.csdn.net/hursing/article/details/9061991
 * http://www.w3schools.com/html/html5_geolocation.asp
+* http://www.w3schools.com/tags/ref_canvas.asp
+* https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect

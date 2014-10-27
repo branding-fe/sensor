@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-10-23 17:23]
+*     Last Modified       :     [2014-10-27 15:59]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -18,8 +18,10 @@ define(['util'], function(util) {
      * @param {number=} opt_options.left 遮罩style的left值 遮罩为绝对定位 默认0
      * @param {number=} opt_options.top 遮罩style的top值 遮罩为绝对定位 默认0
      * @param {string=} opt_options.color 遮罩层颜色 默认使用背景颜色为#666的遮罩
-     * @param {number=} opt_options.transparent 遮罩的透明度 默认为100
+     * @param {number=} opt_options.alpha 遮罩的透明度 默认为100
      * @param {number=} opt_options.checkDistance 用于计算擦除部分的比例的计算点之间的间距，越小越精确，而执行效率越低
+     * @param {number=} opt_options.radius 擦除半径大小
+     * @param {number=} opt_options.alphaRadius 擦除外边缘半透明渐变距离
      * @param {boolean=} opt_options.showPoint 显示计算点，默认false
      */
     function ErasableMask(el, opt_options) {
@@ -39,8 +41,10 @@ define(['util'], function(util) {
             'left': 0,
             'top': 0,
             'color': '#666',
-            'transparent': 100,
+            'alpha': 100,
             'checkDistance': 20,
+            'radius': 20,
+            'alphaRadius': 10,
             'showPoint': false
         };
 
@@ -78,8 +82,8 @@ define(['util'], function(util) {
         cssStr += 'position: absolute;';
         cssStr += 'left: ' + this._configs.left + ';';
         cssStr += 'top: ' + this._configs.top + ';';
-        if (this._configs.transparent) {
-            cssStr += 'opacity: ' + this._configs.transparent / 100 + ';';
+        if (this._configs.alpha) {
+            cssStr += 'opacity: ' + this._configs.alpha / 100 + ';';
         }
         this.maskCanvas.style.cssText += cssStr;
 
@@ -105,12 +109,11 @@ define(['util'], function(util) {
 
         this.maskCanvas.width = width;
         this.maskCanvas.height = height;
-        this._offsetX = mDom.offsetLeft + mDom.clientLeft;
-        this._offsetY = mDom.offsetTop + mDom.clientTop;
+        var mDomRectRect = mDom.getBoundingClientRect();
+        this._offsetX = mDomRectRect.left + document.body.scrollLeft + mDom.clientLeft;
+        this._offsetY = mDomRectRect.top + document.body.scrollTop + mDom.clientTop;
 
         var ctx = this.maskCanvas.getContext('2d');
-        ctx.fillStyle = 'transparent';
-        ctx.fillRect(0, 0, width, height);
         if (configs.maskImage) {
             var img = document.createElement('img');
             img.src = configs.maskImage;
@@ -198,9 +201,23 @@ define(['util'], function(util) {
             }
             var x = (e.clientX + document.body.scrollLeft || e.pageX) - this._offsetX || 0;
             var y = (e.clientY + document.body.scrollTop || e.pageY) - this._offsetY || 0;
+            var eraseRadius = this._configs.radius;
             var ctx = this.maskCanvas.getContext('2d');
             ctx.beginPath();
-            ctx.arc(x , y, 20, 0, Math.PI * 2);
+
+            // 边缘半透明
+            if (this._configs.alphaRadius) {
+                var totalRadius = eraseRadius + this._configs.alphaRadius;
+                var pat = ctx.createRadialGradient(x, y, eraseRadius,
+                                                   x, y, totalRadius);
+                pat.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                pat.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = pat;
+                ctx.arc(x , y, totalRadius, 0, Math.PI * 2);
+            }
+            else  {
+                ctx.arc(x , y, eraseRadius, 0, Math.PI * 2);
+            }
             ctx.fill();
         }
     };
@@ -237,6 +254,11 @@ define(['util'], function(util) {
         var yPoints = Math.ceil(this.maskCanvas.height / step);
         var transCount = 0;
 
+        if (showPoint) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#000';
+        }
+
         for (var i = 0; i < xPoints; i++) {
             for (var j = 0; j < yPoints; j++) {
                 if (i === xPoints - 1) {
@@ -257,13 +279,13 @@ define(['util'], function(util) {
                     transCount++;
                 }
                 if (showPoint) { // 显示用于计算的点，用于测试
-                    ctx.beginPath();
-                    ctx.moveTo(curX, curY);
-                    ctx.lineTo(curX, curY + 1);
-                    ctx.closePath();
-                    ctx.stroke();
+                    ctx.fillRect(curX, curY, 1, 1);
                 }
             }
+        }
+
+        if (showPoint) {
+            ctx.globalCompositeOperation = 'destination-out';
         }
 
         return transCount / (xPoints * yPoints);
@@ -285,7 +307,8 @@ define(['util'], function(util) {
      * 清除遮罩
      */
     ErasableMask.prototype.clearMask = function () {
-        var ctx = this.maskCanvas.getContext('2d');
+        var ctx = this.maskCanvas.getContext('2d')
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
     };
 
