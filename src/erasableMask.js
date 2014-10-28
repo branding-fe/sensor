@@ -2,13 +2,19 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-10-27 15:59]
+*     Last Modified       :     [2014-10-28 17:22]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
 define(['util'], function(util) {
     /**
+     * 给元素添加可擦除的遮罩。
+     * @module ErasableMask
+     */
+
+    /**
      * @constructor
+     * @alias module:ErasableMask
      * @param {Element|string} el 需要遮罩的DOM节点 或 节点的id
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
      * @param {Function=} opt_options.callback 擦除一部分后的回调函数，函数会接收到擦除的百分比
@@ -24,7 +30,7 @@ define(['util'], function(util) {
      * @param {number=} opt_options.alphaRadius 擦除外边缘半透明渐变距离
      * @param {boolean=} opt_options.showPoint 显示计算点，默认false
      */
-    function ErasableMask(el, opt_options) {
+    var ErasableMask = function (el, opt_options) {
         var el = util.getElement(el);
         if (!el) {
             alert('必须要配置使用遮罩的DOM节点。');
@@ -34,7 +40,6 @@ define(['util'], function(util) {
         this.maskedDom = el;
 
         /**
-         * @type {Object} 配置项
          * @private
          */
         this._configs = {
@@ -65,7 +70,7 @@ define(['util'], function(util) {
     /**
      * 设置响应擦除面积百分比改变的回调函数
      * @param {Function} fn 回调函数
-     * @return this 用于链式调用
+     * @return this
      */
     ErasableMask.prototype.setCallback = function(fn) {
         this._configs.callback = fn;
@@ -75,6 +80,7 @@ define(['util'], function(util) {
 
     /**
      * 生成遮罩元素
+     * @private
      */
     ErasableMask.prototype.generateMask = function() {
         this.maskCanvas = document.createElement('canvas');
@@ -97,6 +103,7 @@ define(['util'], function(util) {
     /**
      * 配置遮罩元素
      * @param {Function} cb 配置结束后的回调，在使用图片的时候要等待图片加载完毕再用图片做画笔
+     * @private
      */
     ErasableMask.prototype.configMask = function(cb) {
         var mDom = this.maskedDom;
@@ -115,6 +122,7 @@ define(['util'], function(util) {
 
         var ctx = this.maskCanvas.getContext('2d');
         if (configs.maskImage) {
+            var that = this;
             var img = document.createElement('img');
             img.src = configs.maskImage;
             img.style.display = 'none';
@@ -126,6 +134,16 @@ define(['util'], function(util) {
                 ctx.globalCompositeOperation = 'destination-out';
                 document.body && document.body.removeChild(img);
                 img = null;
+                that.generateCheckPoints();
+
+                // 查看canvas是否被tainted
+                try {
+                    ctx.getImageData(0, 0, 1, 1);
+                }
+                catch (e) {
+                    that.isTainted = true;
+                }
+
                 cb();
             });
         }
@@ -139,6 +157,7 @@ define(['util'], function(util) {
 
     /**
      * 开始响应擦除的动作，并监听已经被擦除了的面积百分比的改变
+     * @return this
      */
     ErasableMask.prototype.start = function () {
         var that = this;
@@ -160,12 +179,44 @@ define(['util'], function(util) {
             that.maskCanvas.addEventListener(leaveEvent, that, false);
         }
         that.configMask(registerEvent);
+        return this;
+    };
+
+    /**
+     * 清除遮罩
+     * @return this
+     */
+    ErasableMask.prototype.clearMask = function () {
+        var ctx = this.maskCanvas.getContext('2d')
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+        return this;
+    };
+
+
+    /**
+     * 停止响应擦除的动作
+     * @return this
+     */
+    ErasableMask.prototype.stop = function () {
+        if (!this.maskedDom) {
+            return;
+        }
+
+        this.maskCanvas.removeEventListener(startEvent, this, false);
+        this.maskCanvas.removeEventListener(moveEvent, this, false);
+        this.maskCanvas.removeEventListener(endEvent, this, false);
+        this.maskCanvas.removeEventListener(leaveEvent, this, false);
+        this.maskedDom.removeChild(this.maskCanvas);
+        this.maskCanvas = null;
+        return this;
     };
 
     /**
      * 接收并分发事件
      * @param {Event} event 事件对象
      * @return {Function} 处理事件的函数
+     * @private
      */
     ErasableMask.prototype.handleEvent = function(event) {
         switch (event.type) {
@@ -180,18 +231,21 @@ define(['util'], function(util) {
         }
     };
 
-    /*
+    /**
      * 处理手指按下事件
      * @param {Event} e 事件对象
+     * @private
      */
     ErasableMask.prototype.startErase = function (e) {
         e.preventDefault();
         this._startedErase = true;
+        this.eraseRecords = [];
     };
 
-    /*
+    /**
      * 处理手指擦除事件
      * @param {Event} e 事件对象
+     * @private
      */
     ErasableMask.prototype.doErase = function (e) {
         e.preventDefault();
@@ -219,12 +273,17 @@ define(['util'], function(util) {
                 ctx.arc(x , y, eraseRadius, 0, Math.PI * 2);
             }
             ctx.fill();
+
+            if (this.isTainted) {
+                this.eraseRecords.push([x, y]);
+            }
         }
     };
 
-    /*
+    /**
      * 结束手指擦除事件
      * @param {Event} e 事件对象
+     * @private
      */
     ErasableMask.prototype.endErase = function (e) {
         if (!this._startedErase) {
@@ -238,27 +297,17 @@ define(['util'], function(util) {
         }
     };
 
-    /*
-     * 计算已经擦除了的比例
+    /**
+     * 获取统计点列表
+     * @private
      */
-    ErasableMask.prototype.getErasePercent = function (showPoint) {
+    ErasableMask.prototype.generateCheckPoints = function (showPoint) {
+        this.checkPoints = [];
         var canvasW = this.maskCanvas.width;
         var canvasH = this.maskCanvas.height;
-        var ctx = this.maskCanvas.getContext('2d');
-        var img = ctx.getImageData(0, 0, canvasW, canvasH);
-        var curX;
-        var curY;
-        var curColor;
         var step = this._configs.checkDistance;
         var xPoints = Math.ceil(this.maskCanvas.width / step);
         var yPoints = Math.ceil(this.maskCanvas.height / step);
-        var transCount = 0;
-
-        if (showPoint) {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = '#000';
-        }
-
         for (var i = 0; i < xPoints; i++) {
             for (var j = 0; j < yPoints; j++) {
                 if (i === xPoints - 1) {
@@ -273,26 +322,107 @@ define(['util'], function(util) {
                 else {
                     curY = window.parseInt(step / 2 + j * step);
                 }
+                // 数组最后一个值用来记录该点是否被擦除了
+                this.checkPoints.push([curX, curY ,0]);
+            }
+        }
+    }
 
+    /**
+     * 计算已经擦除了的比例
+     * @private
+     */
+    ErasableMask.prototype.getErasePercent = function (showPoint) {
+        var canvasW = this.maskCanvas.width;
+        var canvasH = this.maskCanvas.height;
+        var ctx = this.maskCanvas.getContext('2d');
+        if (!this.isTainted) {
+            var img = ctx.getImageData(0, 0, canvasW, canvasH);
+        }
+
+        if (this.isTainted && !showPoint) {
+            return this.getErasePercentByRecord();
+        }
+
+        var curX;
+        var curY;
+        var curColor;
+        var transCount = 0;
+
+        if (showPoint) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#000';
+        }
+
+        var points = this.checkPoints;
+        var pointsLen = points.length;
+
+        for (var i = 0; i < pointsLen; i++) {
+            curX = points[i][0];
+            curY = points[i][1]
+            if (!this.isTainted) {
                 curColor = this.getColorValue(img, curX, curY);
                 if (0 === curColor[3]) {
                     transCount++;
                 }
-                if (showPoint) { // 显示用于计算的点，用于测试
-                    ctx.fillRect(curX, curY, 1, 1);
-                }
+            }
+
+            // 显示用于计算的点，用于测试
+            if (showPoint) {
+                ctx.fillRect(curX, curY, 1, 1);
             }
         }
+
 
         if (showPoint) {
             ctx.globalCompositeOperation = 'destination-out';
         }
+        else {
+            return transCount / pointsLen;
+        }
 
-        return transCount / (xPoints * yPoints);
     };
 
-    /*
+    /**
+     * 由擦除点记录计算擦除面积
+     * @private
+     */
+    ErasableMask.prototype.getErasePercentByRecord = function () {
+        var records = this.eraseRecords;
+        var points = this.checkPoints;
+        var pointsLen = points.length;
+        for (var i = 0, recLen = records.length; i < recLen; i++) {
+            for (var j = 0; j < pointsLen; j++) {
+                if (points[j][2]) {
+                    continue;
+                }
+                if (this._configs.radius >= this.calculateDis(records[i], points[j])) {
+                    points[j][2] = 1;
+                }
+            }
+        }
+
+        var transCount = 0;
+        for (var k = 0; k < pointsLen; k++) {
+            if (points[k][2]) {
+                transCount++;
+            }
+        }
+
+        return transCount / pointsLen;
+    };
+
+    /**
+     * 计算两点之间的距离
+     * @private
+     */
+    ErasableMask.prototype.calculateDis = function (pointA, pointB) {
+        return Math.sqrt(Math.pow(pointA[0] - pointB[0], 2) + Math.pow(pointA[1] - pointB[1], 2));
+    };
+
+    /**
      * 得到canvas生成的图像数据上某一点的颜色值
+     * @private
      */
     ErasableMask.prototype.getColorValue = function (img, x, y) {
         var offset = (x + y * img.width) * 4;
@@ -303,26 +433,6 @@ define(['util'], function(util) {
         return [red, green, blue, alpha];
     };
 
-    /*
-     * 清除遮罩
-     */
-    ErasableMask.prototype.clearMask = function () {
-        var ctx = this.maskCanvas.getContext('2d')
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
-    };
-
-    // 停止响应擦除的动作
-    ErasableMask.prototype.stop = function () {
-        if (!this.maskedDom) {
-            return;
-        }
-
-        this.maskCanvas.removeEventListener(startEvent, this, false);
-        this.maskCanvas.removeEventListener(moveEvent, this, false);
-        this.maskCanvas.removeEventListener(endEvent, this, false);
-        this.maskCanvas.removeEventListener(leaveEvent, this, false);
-    };
 
     return ErasableMask;
 });

@@ -2,18 +2,23 @@
 *     File Name           :     src/geolocation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-10 17:49]
-*     Last Modified       :     [2014-10-23 17:31]
+*     Last Modified       :     [2014-10-28 17:02]
 *     Description         :     地理位置获取接口
 ********************************************************************************/
 
-
 define(['./util'], function(util) {
     /**
+     * 获取用户设备GPS定位经纬度。
+     * @module Geolocation
+     */
+
+    /**
      * @constructor
+     * @alias module:Geolocation
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
      * @param {Function=} opt_options.callback 获取位置信息的回调函数
      */
-    function Geolocation(opt_options) {
+    var Geolocation = function (opt_options) {
         /**
          * @type {Object} 配置项
          * @private
@@ -48,7 +53,7 @@ define(['./util'], function(util) {
     /**
      * 设置获取到经纬度的回调函数
      * @param {Function} fn 回调函数
-     * @return this 用于链式调用
+     * @return this
      */
     Geolocation.prototype.setCallback = function(fn) {
         this.callback = fn;
@@ -58,6 +63,7 @@ define(['./util'], function(util) {
     /**
      * 处理返回的经纬度相关信息
      * @param {Object} pos 经纬度相关信息
+     * @private
      */
     Geolocation.prototype.handlePos = function(pos) {
         // 返回的数据
@@ -96,6 +102,7 @@ define(['./util'], function(util) {
     /**
      * 开始获取定位信息
      * @param {Function} fn 回调函数
+     * @return this
      */
     Geolocation.prototype.start = function() {
         var that = this;
@@ -110,8 +117,11 @@ define(['./util'], function(util) {
             );
         }
         else {
-            this.handlePos();
+            this.handlePos({
+                'code': 'NOT_SUPPORTED'
+            });
         }
+        return this;
     };
 
     return Geolocation;

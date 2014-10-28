@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-10-23 10:49]
+*     Last Modified       :     [2014-10-28 17:43]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -105,13 +105,28 @@ define(function() {
         }
         return target;
     }
-    return {
+
+
+    /**
+     * 工具类
+     * @exports util
+     */
+    var util = {
+        /** 为css样式名添加浏览器前缀 */
         setCssPrefix: prefix,
+        /** 判断浏览器是否为Firefox */
         isFirefox: isFirefox,
+        /** 判断验证对象是否为Function */
         isFunction: isFunction,
+        /** 判断验证对象是否为String */
         isString: isString,
+        /** 判断验证对象是否为Array */
         isArray: isArray,
+        /** 获取DOM对象，传入字符型时做为id处理 */
         getElement: getElement,
+        /** 将源对象的所有属性拷贝到目标对象中 */
         extend: extend
     };
+
+    return util;
 });

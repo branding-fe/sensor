@@ -2,14 +2,20 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-10-23 17:31]
+*     Last Modified       :     [2014-10-28 17:22]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
 
 define(['./util'], function(util) {
     /**
+     * Orientation会持续的取得移动设备的alpha, beta, gamma的值。
+     * @module Orientation
+     */
+
+    /**
      * @constructor
+     * @alias module:Orientation
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
      * @param {Function=} opt_options.callback 获取倾斜值的回调函数
      * @param {number=} opt_options.alphaThreshold 水平旋转alpha值改变触发回调的临界值
@@ -18,7 +24,7 @@ define(['./util'], function(util) {
      * @param {number=} opt_options.timeInterval 监听倾斜值改变的时间间隔
      * @param {boolean=} opt_options.radians 是否使用弧度值代替角度值
      */
-    function Orientation(opt_options) {
+    var Orientation = function (opt_options) {
 
         /**
          * @type {boolean} 是否支持监听倾斜
@@ -59,6 +65,7 @@ define(['./util'], function(util) {
     /**
      * 设置响应倾斜的回调函数
      * @param {Function} fn 回调函数
+     * @return this
      */
     Orientation.prototype.setCallback = function(fn) {
         this._configs.callback = fn;
@@ -67,7 +74,7 @@ define(['./util'], function(util) {
 
     /**
      * 开始手机翻转互动
-     * @return {boolean} this: 手机翻转对象, false: 不支持手机翻转
+     * @return {Object|boolean} this: 手机翻转对象, false: 不支持手机翻转
      */
     Orientation.prototype.start = function() {
         if (!this._hasDeviceOrientation) {
@@ -78,7 +85,10 @@ define(['./util'], function(util) {
         return this;
     };
 
-    // 停止检测手机翻转
+    /**
+     * 停止检测手机翻转
+     * @return this
+     */
     Orientation.prototype.stop = function () {
         if (this._hasDeviceOrientation) {
             window.removeEventListener('deviceorientation', this, false);
@@ -89,6 +99,7 @@ define(['./util'], function(util) {
     /**
      * 翻转事件处理函数
      * @param {Event} event 事件对象
+     * @private
      */
     Orientation.prototype.deviceorientation = function(event) {
         var currentTime = new Date();
@@ -126,11 +137,13 @@ define(['./util'], function(util) {
      * 接收并分发事件
      * @param {Event} event 事件对象
      * @return {Function} 处理事件的函数
+     * @private
      */
     Orientation.prototype.handleEvent = function(event) {
         if (util.isFunction(this[event.type])) {
             return this[event.type](event);
         }
     };
+
     return Orientation;
 });

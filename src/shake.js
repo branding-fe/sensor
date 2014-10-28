@@ -2,19 +2,25 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-10-23 17:30]
+*     Last Modified       :     [2014-10-28 17:30]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
 
 define(['util'], function(util) {
     /**
+     * Shake会监听移动设备的摇晃动作，会返回触发事件时各个方向的加速度值(考虑重力加速度)。
+     * @module Shake
+     */
+
+    /**
      * @constructor
+     * @alias module:Shake
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
      * @param {number=} opt_options.threshold 各个方向加速度值改变触发回调的临界值
      * @param {number=} opt_options.timeInterval 监听加速度值改变的时间间隔
      */
-    function Shake(opt_options) {
+    var Shake = function (opt_options) {
 
         /**
          * @type {boolean} 是否支持监听加速运动
@@ -52,7 +58,7 @@ define(['util'], function(util) {
     /**
      * 设置响应加速度改变的回调函数
      * @param {Function} fn 回调函数
-     * @return this 用于链式调用
+     * @return this
      */
     Shake.prototype.setCallback = function(fn) {
         this._configs.callback = fn;
@@ -76,7 +82,7 @@ define(['util'], function(util) {
     };
 
     /** 停止检测手机加速度
-     * @return this 用于链式调用
+     * @return this
      */
     Shake.prototype.stop = function () {
         if (this._hasDeviceMotion) {
@@ -91,6 +97,7 @@ define(['util'], function(util) {
     /**
      * 加速运动事件处理函数
      * @param {Event} event 事件对象
+     * @private
      */
     Shake.prototype.devicemotion = function (event) {
         var current = event.accelerationIncludingGravity;
@@ -136,6 +143,7 @@ define(['util'], function(util) {
      * 接收并分发事件
      * @param {Event} event 事件对象
      * @return {Function} 处理事件的函数
+     * @private
      */
     Shake.prototype.handleEvent = function (event) {
         if (util.isFunction(this[event.type])) {
