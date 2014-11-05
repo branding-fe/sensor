@@ -2,11 +2,11 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-10-28 17:22]
+*     Last Modified       :     [2014-11-05 15:03]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
-define(['util'], function(util) {
+define(['util', 'wave'], function(util, wave) {
     /**
      * 给元素添加可擦除的遮罩。
      * @module ErasableMask
@@ -27,6 +27,9 @@ define(['util'], function(util) {
      * @param {number=} opt_options.alpha 遮罩的透明度 默认为100
      * @param {number=} opt_options.checkDistance 用于计算擦除部分的比例的计算点之间的间距，越小越精确，而执行效率越低
      * @param {number=} opt_options.radius 擦除半径大小
+     * @param {number=} opt_options.eraseWidth 擦除宽度
+     * @param {number=} opt_options.eraseHeight 擦除高度
+     * @param {number=} opt_options.angle 旋转弧度，旋转角度，以弧度计。角度转换为弧度计算 degrees*Math.PI/180
      * @param {number=} opt_options.alphaRadius 擦除外边缘半透明渐变距离
      * @param {boolean=} opt_options.showPoint 显示计算点，默认false
      */
@@ -97,6 +100,8 @@ define(['util'], function(util) {
         if ('absolute' !== maskedDomStyle.position && 'relative' !== maskedDomStyle.position) {
             this.maskedDom.style.position = 'relative';
         }
+        this.originOverflow = maskedDomStyle.overflow;
+        this.maskedDom.style.overflow = 'hidden';
         this.maskedDom.appendChild(this.maskCanvas);
     };
 
@@ -113,6 +118,20 @@ define(['util'], function(util) {
                     mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRight);
         var height = configs.height ? configs.height :
                      mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottom);
+
+        // 处理刷子图片
+        if (configs.eraseImage) {
+            this.eraseImage = this.createFloatImage(configs.eraseImage, width / 2 , height / 2, 37, 135);
+            var angle = -this._configs.angle;
+            if (angle) {
+                var rotateStyle = 'transform:rotate(' + angle + 'deg);' +
+                                  '-ms-transform:rotate(' + angle + 'deg);' +     // IE 9
+                                  '-moz-transform:rotate(' + angle + 'deg);' +    // Firefox
+                                  '-webkit-transform:rotate(' + angle + 'deg);' + // Safari 和 Chrome
+                                  '-o-transform:rotate(' + angle + 'deg);';
+                this.eraseImage.style.cssText += rotateStyle;
+            }
+        }
 
         this.maskCanvas.width = width;
         this.maskCanvas.height = height;
@@ -144,14 +163,15 @@ define(['util'], function(util) {
                     that.isTainted = true;
                 }
 
-                cb();
+                cb(ctx);
             });
         }
         else {
             ctx.fillStyle = configs.color;
             ctx.fillRect(0, 0, width, height);
+            this.generateCheckPoints();
             ctx.globalCompositeOperation = 'destination-out';
-            cb();
+            cb(ctx);
         }
     };
 
@@ -169,14 +189,21 @@ define(['util'], function(util) {
             that.generateMask();
         }
 
-        function registerEvent() {
+        function registerEvent(ctx) {
             if (that._configs.showPoint) {
                 that.getErasePercent(true);
             }
+
             that.maskCanvas.addEventListener(startEvent, that, false);
             that.maskCanvas.addEventListener(moveEvent, that, false);
             that.maskCanvas.addEventListener(endEvent, that, false);
             that.maskCanvas.addEventListener(leaveEvent, that, false);
+
+            if (that.eraseImage) {
+                that.eraseImage.addEventListener(startEvent, that, false);
+                that.eraseImage.addEventListener(moveEvent, that, false);
+                that.eraseImage.addEventListener(endEvent, that, false);
+            }
         }
         that.configMask(registerEvent);
         return this;
@@ -187,9 +214,9 @@ define(['util'], function(util) {
      * @return this
      */
     ErasableMask.prototype.clearMask = function () {
+        this.clearRainDrop();
         var ctx = this.maskCanvas.getContext('2d')
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+        ctx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
         return this;
     };
 
@@ -209,6 +236,7 @@ define(['util'], function(util) {
         this.maskCanvas.removeEventListener(leaveEvent, this, false);
         this.maskedDom.removeChild(this.maskCanvas);
         this.maskCanvas = null;
+        this.maskedDom.style.overflow = this.maskedDom.originOverflow;
         return this;
     };
 
@@ -240,6 +268,11 @@ define(['util'], function(util) {
         e.preventDefault();
         this._startedErase = true;
         this.eraseRecords = [];
+        if (this._configs.onStart) {
+            var x = (e.clientX + document.body.scrollLeft || e.pageX) - this._offsetX || 0;
+            var y = (e.clientY + document.body.scrollTop || e.pageY) - this._offsetY || 0;
+            this._configs.onStart(x, y);
+        }
     };
 
     /**
@@ -255,30 +288,114 @@ define(['util'], function(util) {
             }
             var x = (e.clientX + document.body.scrollLeft || e.pageX) - this._offsetX || 0;
             var y = (e.clientY + document.body.scrollTop || e.pageY) - this._offsetY || 0;
+
+
+            if (this.eraseImage) {
+                this.eraseImage.style.left = (x - this.eraseImage.offsetWidth / 2) + 'px';
+                this.eraseImage.style.top = (y - this.eraseImage.offsetHeight / 2) + 'px';
+            }
             var eraseRadius = this._configs.radius;
             var ctx = this.maskCanvas.getContext('2d');
             ctx.beginPath();
 
-            // 边缘半透明
-            if (this._configs.alphaRadius) {
-                var totalRadius = eraseRadius + this._configs.alphaRadius;
-                var pat = ctx.createRadialGradient(x, y, eraseRadius,
-                                                   x, y, totalRadius);
-                pat.addColorStop(0, 'rgba(255, 255, 255, 1)');
-                pat.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                ctx.fillStyle = pat;
-                ctx.arc(x , y, totalRadius, 0, Math.PI * 2);
+            // 方
+            if (this._configs.eraseWidth) {
+                ctx.fillStyle = '#000';
+                this.eraseOval(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle);
             }
-            else  {
-                ctx.arc(x , y, eraseRadius, 0, Math.PI * 2);
+            // 圆
+            else if (this._configs.radius) {
+                // 边缘半透明 // 方形的TOBE CONTINUE
+                if (this._configs.alphaRadius) {
+                    var totalRadius = eraseRadius + this._configs.alphaRadius;
+                    var pat = ctx.createRadialGradient(x, y, eraseRadius,
+                                                       x, y, totalRadius);
+                    pat.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                    pat.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    ctx.fillStyle = pat;
+                    this.eraseCircle(ctx, x, y, totalRadius);
+                }
+                else {
+                    this.eraseCircle(ctx, x, y, eraseRadius);
+                }
             }
-            ctx.fill();
 
             if (this.isTainted) {
                 this.eraseRecords.push([x, y]);
             }
         }
     };
+
+    /**
+     * 绘制canvas一个圆形范围
+     * @param {Object} ctx canvas用于绘图的对象
+     * @param {number} x 圆形的x坐标
+     * @param {number} y 圆形的y坐标
+     * @param {number} r 圆形的半径
+     * @private
+     */
+    ErasableMask.prototype.eraseCircle = function (ctx, x, y, r) {
+        ctx.beginPath(); // 避免路径混淆
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    /**
+     * 绘制canvas一个方形范围
+     * @param {Object} ctx canvas用于绘图的对象
+     * @param {number} x 方形的中心点x坐标
+     * @param {number} y 方形的中心点y坐标
+     * @param {number} w 方形的宽
+     * @param {number} h 方形的高
+     * @param {number} a 按中心点顺时针旋转角度
+     * @private
+     */
+    ErasableMask.prototype.eraseRect = function (ctx, x, y, w, h, a) {
+        if (a) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(a * Math.PI / 180);
+            ctx.fillRect( - w / 2,  - h / 2, w, h); //坐标点移到了[x, y]
+            ctx.restore();
+        }
+        else {
+            ctx.fillRect(x - w / 2, y - h / 2, w, h);
+        }
+    }
+
+    /**
+     * 绘制canvas一个椭圆形范围
+     * @param {Object} ctx canvas用于绘图的对象
+     * @param {number} x 椭圆形的中心点x坐标
+     * @param {number} y 椭圆形的中心点y坐标
+     * @param {number} w 椭圆形的宽
+     * @param {number} h 椭圆形的高
+     * @param {number} a 按中心点顺时针旋转角度
+     * @private
+     */
+    ErasableMask.prototype.eraseOval = function (ctx, x, y, w, h, a) {
+        function fillOval(ox, oy, ow, oh) {
+            var k = (ow / 0.75) / 2;
+            var w = ow / 2;
+            var h = oh / 2;
+            ctx.beginPath();
+            ctx.moveTo(ox, oy - h);
+            ctx.bezierCurveTo(ox + k, oy - h, ox + k, oy + h, ox, oy + h);
+            ctx.bezierCurveTo(ox - k, oy + h, ox - k, oy - h, ox, oy - h);
+            ctx.closePath();
+            ctx.fill();
+        }
+        if (a) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(a * Math.PI / 180);
+            fillOval(0, 0, w, h);// 坐标点移到了[x, y]
+            ctx.restore();
+        }
+        else {
+            fillOval(x, y, w, h);
+        }
+    }
 
     /**
      * 结束手指擦除事件
@@ -292,8 +409,10 @@ define(['util'], function(util) {
         e.preventDefault();
         this._startedErase = false;
         var erasePercent = this.getErasePercent();
+        var x = (e.clientX + document.body.scrollLeft || e.pageX) - this._offsetX || 0;
+        var y = (e.clientY + document.body.scrollTop || e.pageY) - this._offsetY || 0;
         if (this._configs.callback) {
-            this._configs.callback(erasePercent * 100);
+            this._configs.callback(erasePercent * 100, x, y);
         }
     };
 
@@ -301,7 +420,7 @@ define(['util'], function(util) {
      * 获取统计点列表
      * @private
      */
-    ErasableMask.prototype.generateCheckPoints = function (showPoint) {
+    ErasableMask.prototype.generateCheckPoints = function () {
         this.checkPoints = [];
         var canvasW = this.maskCanvas.width;
         var canvasH = this.maskCanvas.height;
@@ -330,6 +449,8 @@ define(['util'], function(util) {
 
     /**
      * 计算已经擦除了的比例
+     * @param {boolean} showPoint 是否是显示统计点
+     * @return {number=} 擦除面积百分比，用于显示统计点时不返回数据
      * @private
      */
     ErasableMask.prototype.getErasePercent = function (showPoint) {
@@ -384,23 +505,34 @@ define(['util'], function(util) {
     };
 
     /**
-     * 由擦除点记录计算擦除面积
+     * 由擦除点记录计算擦除面积// TODO
+     * @return {number} 擦除面积百分比
      * @private
      */
     ErasableMask.prototype.getErasePercentByRecord = function () {
         var records = this.eraseRecords;
         var points = this.checkPoints;
         var pointsLen = points.length;
+
+        var inTimes = 0;
+        var caTimes = 0;
+
+        var needCheckArr;
         for (var i = 0, recLen = records.length; i < recLen; i++) {
+            needCheckArr = this.getNeedCheckArr(records[i]);
             for (var j = 0; j < pointsLen; j++) {
+                inTimes++;
                 if (points[j][2]) {
                     continue;
                 }
+                caTimes++;
                 if (this._configs.radius >= this.calculateDis(records[i], points[j])) {
                     points[j][2] = 1;
                 }
             }
         }
+        console.log(inTimes);
+        console.log(caTimes);
 
         var transCount = 0;
         for (var k = 0; k < pointsLen; k++) {
@@ -412,8 +544,24 @@ define(['util'], function(util) {
         return transCount / pointsLen;
     };
 
+
+    /**
+     * 根据手指触摸坐标获得覆盖了的统计点的大致范围，用来减少计算次数 //TODO
+     * @param {Array} point 手指当前按下的坐标点
+     * @return {Array} 坐标数组
+     * @private
+     */
+    ErasableMask.prototype.getNeedCheckArr = function (point) {
+        var firstCheckPoint = this.checkPoints[0];
+        var r = this._configs.radius;
+        var minX = point[0] - r;
+    };
+
     /**
      * 计算两点之间的距离
+     * @param {Array} pointA 第一个点的坐标
+     * @param {Array} pointB 第二个点的坐标
+     * @return {number} 距离数值
      * @private
      */
     ErasableMask.prototype.calculateDis = function (pointA, pointB) {
@@ -422,6 +570,10 @@ define(['util'], function(util) {
 
     /**
      * 得到canvas生成的图像数据上某一点的颜色值
+     * @param {ImageData} img canvas生成的ImageData对象
+     * @param {number} x 验证点x坐标
+     * @param {number} y 验证点y坐标
+     * @return {Array} 颜色值
      * @private
      */
     ErasableMask.prototype.getColorValue = function (img, x, y) {
@@ -433,6 +585,100 @@ define(['util'], function(util) {
         return [red, green, blue, alpha];
     };
 
+    /**
+     * 自动坠落的擦除(雨滴效果)
+     * @param {number} x 开始坠落的中心x点
+     * @param {number} y 开始坠落的中心y点
+     * @param {number} w 雨滴宽度
+     * @param {number} h 雨滴高度
+     * @param {string} src 雨滴图片
+     * @param {number} time 坠落时间毫秒
+     * @param {number} distance 坠落距离
+     * @return this
+     */
+    ErasableMask.prototype.rainDrop = function (src, x, y, w, h, time, distance) {
+        if (!this.maskCanvas) {
+            return;
+        }
+        var that= this;
+        var ctx = this.maskCanvas.getContext('2d');
+        var startTime = Date.now();
+        var rainImage = that.createFloatImage(src, x + 1, y - 3, w + 6, h + 6);
+        var easing = wave('ease-out');
+
+        this.rainDrops = this.rainDrops || [];
+        this.rainDrops.push(rainImage);
+        var toY;
+        function run() {
+            if (!that.maskCanvas) {
+                return;
+            }
+            var p = (Date.now() - startTime) / time;
+            if (p > 1) {
+                that.eraseRect(ctx, x, y + distance / 2, w, distance);
+                that.eraseCircle(ctx, x, y + distance, w / 2);
+                return;
+            }
+            else {
+                toY = easing(p) * distance;
+                that.eraseRect(ctx, x, y + easing(p) * distance / 2, w, toY);
+                rainImage.style.top = (y + toY - 3) + 'px';
+                util.nextFrame(run);
+            }
+        }
+        this.eraseCircle(ctx, x, y, w / 2);
+
+        run();
+        return this;
+    };
+
+    /**
+     * 清除雨滴
+     * @return this
+     */
+    ErasableMask.prototype.clearRainDrop = function () {
+        if (!this.rainDrops || !this.maskedDom) {
+            return;
+        }
+        for (var i = 0, len = this.rainDrops.length; i < len; i++) {
+            this.maskedDom.removeChild(this.rainDrops[i]);
+        }
+        this.rainDrops = [];
+        return this;
+    };
+
+    /**
+     * 创建一个在浮在canvas上面的图片
+     * @param {string|Element} src 图片地址或图片DOM对象
+     * @param {number} x 图片放置的中心x点
+     * @param {number} y 图片放置的中心y点
+     * @param {number} w 图片宽度
+     * @param {number} h 图片高度
+     * @return {Element} 图片DOM对象
+     * @private
+     */
+    ErasableMask.prototype.createFloatImage = function (src, x, y, w, h) {
+        var img;
+        var cssStr;
+        if (util.isString(src)) {
+            img = document.createElement('div');
+            var cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
+        }
+        else {
+            img = src;
+        }
+
+        cssStr += 'background-size: 100% 100%;';
+        cssStr += 'position: absolute;';
+        cssStr += 'left: ' + (x - w / 2) + 'px;';
+        cssStr += 'top: ' + (y - h / 2) + 'px;';
+        cssStr += 'width: ' + w + 'px;';
+        cssStr += 'height: ' + h + 'px;';
+        img.style.cssText += cssStr;
+
+        this.maskedDom.appendChild(img);
+        return img;
+    };
 
     return ErasableMask;
 });

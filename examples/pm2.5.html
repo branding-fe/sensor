@@ -1,5 +1,5 @@
 <!--******************************************************************************
-*     File Name           :     erasableMask.html
+*     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
 *     Last Modified       :     [2014-11-05 14:27]
@@ -14,35 +14,31 @@
     <title>Erasable Mask</title>
     <script type="text/javascript" src="../src/require.js"></script>
     <style>
-    #outerWrap {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        padding: 5px;
-        margin: 5px;
-        border: 1px solid #555;
+    body {
+        padding: 0;
+        margin: 0;
     }
     #imgWrap {
-        width: 500px;
-        height: 350px;
+        width: 100%;
         position: relative;
-        margin: 5px;
+    }
+    .originCont {
+        width: 100%;
     }
     #percentDom {
         position: absolute;
-        bottom: 0;
+        top: 5px;
         left: 5px;
         color: #111;
         font-size: 14px;
+        z-index: 100;
     }
     </style>
 </head>
 <body>
-<div id="outerWrap">
 <div id="imgWrap">
-    <img src="../images/pet.jpg" />
+    <img class="originCont" src="../images/pm2.5/pm_bg.jpg" />
     <div id="percentDom"></div>
-</div>
 </div>
 <script>
 require.config({
@@ -57,19 +53,32 @@ require(['erasableMask'], function(Mask) {
     var perStr;
     var perDom = document.getElementById('percentDom');
     var mask = new Mask('imgWrap', {
-        width: 500,
-        height: 332,
         alpha: 90,
         alphaRadius: 5,
-        eraseWidth: 20,
+        eraseWidth: 40,
         eraseHeight: 100,
         angle: 45,
-        maskImage: '/images/pet2.jpg',
+        eraseImage: '/images/pm2.5/pm_bottle.png',
+        color: '#ddd',
         showPoint: true,
+        onStart: function(x, y) {
+            genRain(x - 20, y + 80, 14, 14, 4000, 400, 200);
+            genRain(x - 100, y + 60, 10, 10, 4000, 500, 1000);
+        },
         callback: function(percent, x, y) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';
             perDom.innerHTML = perStr;
+            if (percent >= 20) {
+                genRain(x, y + 70, 8, 8, 4000, 400, 200);
+            }
+            if (percent >= 25) {
+                genRain(x, y + 50, 12, 12, 5000, 600, 200);
+            }
+            if (percent >= 30) {
+                genRain(x, y + 90, 9, 9, 5000, 500, 200);
+            }
             if (percent >= 40) {
+                mask.clearRainDrop();
                 mask.clearMask();
                 mask.stop();
                 perDom.innerHTML = '已清除全部遮罩';
@@ -77,6 +86,20 @@ require(['erasableMask'], function(Mask) {
         }
     });
     mask.start();
+
+    var rainDrops = 0;
+    // 生成雨滴 最多生成5个
+    function genRain(x, y, w, h, t, d, l) {
+        console.log([x, y]);
+        if (rainDrops >= 5) {
+            return;
+        }
+        rainDrops++;
+        setTimeout(function() {
+            mask.rainDrop('/images/pm2.5/waterdrop.png', x, y, w, h, t, d);
+        }, l);
+    }
+
 })();
 </script>
 </body>

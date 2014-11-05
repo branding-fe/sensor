@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-10-28 17:43]
+*     Last Modified       :     [2014-11-04 15:32]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -32,6 +32,32 @@ define(function() {
         }
 
         return false;
+    })();
+
+    /**
+     * @type {Function}
+     * @param {Function} callback 下一次重绘时的回调函数
+     * @return {number} 定时标记用于取消回调的执行
+     * 在页面的下一个repaint时调用回调
+     */
+    var nextFrame = (function() {
+        return window.requestAnimationFrame ||
+            window[vender + 'RequestAnimationFrame'] ||
+            function(callback) {
+                return setTimeout(callback, 1000 / 60);
+            };
+    })();
+
+    /**
+     * @type {Function}
+     * @param {id} number requestAnimationFrame执行后的标记
+     * 取消requestAnimationFrame回调
+     */
+    var cancelFrame = (function() {
+        return window.cancelRequestAnimationFrame ||
+            window.webkitCancelRequestAnimationFrame ||
+            window[vender + 'RequestAnimationFrame'] ||
+            clearTimeout;
     })();
 
     /**
@@ -112,6 +138,14 @@ define(function() {
      * @exports util
      */
     var util = {
+        /** 在页面的下一个repaint时调用回调 */
+        nextFrame: function (fn) {
+            return nextFrame(fn)
+        },
+        /** 取消requestAnimationFrame回调 */
+        cancelFrame: function (index) {
+            cancelFrame(index);
+        },
         /** 为css样式名添加浏览器前缀 */
         setCssPrefix: prefix,
         /** 判断浏览器是否为Firefox */
