@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-11-04 15:32]
+*     Last Modified       :     [2014-11-06 10:14]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -140,7 +140,7 @@ define(function() {
     var util = {
         /** 在页面的下一个repaint时调用回调 */
         nextFrame: function (fn) {
-            return nextFrame(fn)
+            return nextFrame(fn);
         },
         /** 取消requestAnimationFrame回调 */
         cancelFrame: function (index) {
@@ -148,6 +148,8 @@ define(function() {
         },
         /** 为css样式名添加浏览器前缀 */
         setCssPrefix: prefix,
+        /** 为css样式名添加浏览器前缀 */
+        styleVender: vender,
         /** 判断浏览器是否为Firefox */
         isFirefox: isFirefox,
         /** 判断验证对象是否为Function */

@@ -2,8 +2,8 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-05 14:27]
-*     Description         :     rub part of mask
+*     Last Modified       :     [2014-11-06 18:14]
+*     Description         :     erase part of mask
 *******************************************************************************-->
 
 <!doctype html>
@@ -48,40 +48,53 @@ require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
+    var bottleImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_bottle.png';
+    var coverImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_tip.png';
+    var logoImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png';
+    var waterImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/waterdrop.png';
 
 
     var perStr;
-    var perDom = document.getElementById('percentDom');
+    // var perDom = document.getElementById('percentDom');
     var mask = new Mask('imgWrap', {
         alpha: 90,
-        alphaRadius: 5,
-        eraseWidth: 40,
+        alphaRadius: 10,
+        //radius: 20,
+        eraseWidth: 60,
         eraseHeight: 100,
         angle: 45,
-        eraseImage: '/images/pm2.5/pm_bottle.png',
+        eraseImage: bottleImg,
+        eraseImageWidth: 37,
+        eraseImageHeight: 135,
+        eraseCoverImage: coverImg,
+        eraseCoverImageWidth: 117,
+        eraseCoverImageHeight: 117,
+        logoImage: logoImg,
+        logoClickStart: true,
+        logoStyle: 'width: 44px; height: 25px; top: 47px; right: 17px;',
         color: '#ddd',
-        showPoint: true,
+        //showPoint: true,
         onStart: function(x, y) {
-            genRain(x - 20, y + 80, 14, 14, 4000, 400, 200);
-            genRain(x - 100, y + 60, 10, 10, 4000, 500, 1000);
+            genRain(x - 10, y + 30, 14, 14, 4000, 400, 200);
+            genRain(x - 35, y + 20, 10, 10, 4000, 500, 1000);
         },
         callback: function(percent, x, y) {
-            perStr = '擦除百分比为：' + Math.floor(percent) + '%';
-            perDom.innerHTML = perStr;
-            if (percent >= 20) {
-                genRain(x, y + 70, 8, 8, 4000, 400, 200);
+            // perStr = '擦除百分比为：' + Math.floor(percent) + '%';
+            // perDom.innerHTML = perStr;
+            if (percent >= 5) {
+                genRain(x, y + 20, 8, 8, 4000, 400, 200);
+            }
+            if (percent >= 15) {
+                genRain(x, y + 30, 12, 12, 5000, 600, 200);
             }
             if (percent >= 25) {
-                genRain(x, y + 50, 12, 12, 5000, 600, 200);
+                genRain(x + 20, y + 20, 9, 9, 5000, 500, 200);
             }
             if (percent >= 30) {
-                genRain(x, y + 90, 9, 9, 5000, 500, 200);
-            }
-            if (percent >= 40) {
-                mask.clearRainDrop();
-                mask.clearMask();
-                mask.stop();
-                perDom.innerHTML = '已清除全部遮罩';
+
+                mask.clearMask(2000, stopRain);
+                mask.rotateEraseImage(2000, stopRain);
+                // perDom.innerHTML = '已清除全部遮罩';
             }
         }
     });
@@ -89,15 +102,26 @@ require(['erasableMask'], function(Mask) {
 
     var rainDrops = 0;
     // 生成雨滴 最多生成5个
-    function genRain(x, y, w, h, t, d, l) {
-        console.log([x, y]);
+    function genRain (x, y, w, h, t, d, l) {
         if (rainDrops >= 5) {
             return;
         }
         rainDrops++;
         setTimeout(function() {
-            mask.rainDrop('/images/pm2.5/waterdrop.png', x, y, w, h, t, d);
+            mask.rainDrop(waterImg, x, y, w, h, t, d);
         }, l);
+    }
+
+    var stopFlag = 0;
+    // 结束Rain
+    function stopRain () {
+        stopFlag++;
+        if (stopFlag >= 2) {
+            mask.stop();
+            rainDrops = 0;
+            // perDom.innerHTML = '';
+            stopFlag = 0;
+        }
     }
 
 })();
