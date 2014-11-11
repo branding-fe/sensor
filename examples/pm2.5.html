@@ -2,7 +2,7 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-06 18:14]
+*     Last Modified       :     [2014-11-11 13:00]
 *     Description         :     erase part of mask
 *******************************************************************************-->
 
@@ -48,6 +48,7 @@ require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
+    var maskImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_fog.png';
     var bottleImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_bottle.png';
     var coverImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_tip.png';
     var logoImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png';
@@ -57,21 +58,22 @@ require(['erasableMask'], function(Mask) {
     var perStr;
     // var perDom = document.getElementById('percentDom');
     var mask = new Mask('imgWrap', {
-        alpha: 90,
+        //alpha: 65,
         alphaRadius: 10,
-        //radius: 20,
+        radius: 40,
         eraseWidth: 60,
         eraseHeight: 100,
         angle: 45,
         eraseImage: bottleImg,
-        eraseImageWidth: 37,
-        eraseImageHeight: 135,
+        eraseImageWidth: 43,
+        eraseImageHeight: 157,
         eraseCoverImage: coverImg,
-        eraseCoverImageWidth: 117,
-        eraseCoverImageHeight: 117,
+        eraseCoverImageWidth: 141,
+        eraseCoverImageHeight: 141,
         logoImage: logoImg,
         logoClickStart: true,
         logoStyle: 'width: 44px; height: 25px; top: 47px; right: 17px;',
+        maskImage: maskImage,
         color: '#ddd',
         //showPoint: true,
         onStart: function(x, y) {

@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-06 18:14]
+*     Last Modified       :     [2014-11-11 12:52]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -18,7 +18,7 @@ define(['util', 'wave'], function(util, wave) {
      * @param {Element|string} el 需要遮罩的DOM节点 或 节点的id
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值
      * @param {Function=} opt_options.callback 擦除一部分后的回调函数，函数会接收到擦除的百分比
-     * @param {string=} opt_options.image 用于遮罩的图片 默认不用图片
+     * @param {string=} opt_options.maskImage 用于遮罩的图片 默认不用图片
      * @param {number=} opt_options.width 遮罩宽度 默认为被遮罩的元素宽度
      * @param {number=} opt_options.height 遮罩高度 默认为被遮罩的元素高度
      * @param {number=} opt_options.left 遮罩style的left值 遮罩为绝对定位 默认0
@@ -181,9 +181,10 @@ define(['util', 'wave'], function(util, wave) {
             img.style.display = 'none';
             document.body && document.body.appendChild(img);
             img.addEventListener('load', function() {
-                var pat = ctx.createPattern(img, 'repeat');
-                ctx.fillStyle = pat;
-                ctx.fillRect(0, 0, width, height);
+                //var pat = ctx.createPattern(img, 'repeat');
+                //ctx.fillStyle = pat;
+                //ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
                 ctx.globalCompositeOperation = 'destination-out';
                 document.body && document.body.removeChild(img);
                 img = null;
@@ -808,6 +809,7 @@ define(['util', 'wave'], function(util, wave) {
         var toAngle = curAngle;
 
         var easing = wave('ease-out');
+        var cssStr;
         var that = this;
         function run() {
             if (!that.maskCanvas) {
@@ -820,11 +822,12 @@ define(['util', 'wave'], function(util, wave) {
                 return;
             }
             else {
-                that.eraseImage.style.left = (curX + (toX - curX) * easing(p)) + 'px';
-                that.eraseImage.style.top = (curY + (toY - curY) * easing(p)) + 'px';
-                that.eraseImage.style.width = oriW * (1 - easing(p)) + 'px';
-                that.eraseImage.style.height = oriH * (1 - easing(p)) + 'px';
                 toAngle = toAngle >= 360 ? 0 : toAngle + 20;
+                cssStr = "left:" + (curX + (toX - curX) * easing(p)) + 'px;' +
+                         "top:" + (curY + (toY - curY) * easing(p)) + 'px;' +
+                         "width:" + oriW * (1 - easing(p)) + 'px;' +
+                         "height:" + oriH * (1 - easing(p)) + 'px';
+                that.eraseImage.style.cssText += cssStr;
                 that.eraseImage.style[transformStr] = 'rotate(' + toAngle + 'deg)';
                 util.nextFrame(run);
             }
