@@ -2,7 +2,7 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-11 13:00]
+*     Last Modified       :     [2014-11-12 18:28]
 *     Description         :     erase part of mask
 *******************************************************************************-->
 
@@ -40,10 +40,11 @@
     <img class="originCont" src="../images/pm2.5/pm_bg.jpg" />
     <div id="percentDom"></div>
 </div>
+<script type="text/javascript" src="http://dev046.baidu.com:8096/build/erasableMask.js"></script>
 <script>
-require.config({
-    baseUrl: '../src'
-});
+//require.config({
+//    baseUrl: '../src'
+//});
 require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
@@ -53,23 +54,36 @@ require(['erasableMask'], function(Mask) {
     var coverImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_tip.png';
     var logoImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png';
     var waterImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/waterdrop.png';
+    var airIndex = 130;
+    var airIndexText = '轻度污染';
 
+    var hrefIndex = /\airIndex=(\d+)/.exec(location.href);
+    if (hrefIndex && hrefIndex.length > 1) {
+        airIndex = hrefIndex[1];
+    }
+
+    if (airIndex >= 200) {
+        maskImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_fog_big.png';
+        airIndexText = '重度污染';
+    }
 
     var perStr;
     // var perDom = document.getElementById('percentDom');
     var mask = new Mask('imgWrap', {
         //alpha: 65,
         alphaRadius: 10,
-        radius: 40,
-        eraseWidth: 60,
-        eraseHeight: 100,
+        radius: 100,
+        eraseWidth: 50,
+        eraseHeight: 140,
         angle: 45,
         eraseImage: bottleImg,
-        eraseImageWidth: 43,
-        eraseImageHeight: 157,
+        eraseImageWidth: 49,
+        eraseImageHeight: 134,
         eraseCoverImage: coverImg,
-        eraseCoverImageWidth: 141,
-        eraseCoverImageHeight: 141,
+        eraseCoverImageWidth: 142,
+        eraseCoverImageHeight: 196,
+        eraseCoverText: airIndex,
+        eraseCoverTextDesc: airIndexText,
         logoImage: logoImg,
         logoClickStart: true,
         logoStyle: 'width: 44px; height: 25px; top: 47px; right: 17px;',

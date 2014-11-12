@@ -2,7 +2,7 @@
 *     File Name           :     Gruntfile.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-28 18:08]
-*     Last Modified       :     [2014-10-29 11:33]
+*     Last Modified       :     [2014-11-12 18:22]
 *     Description         :     Gruntfile
 ********************************************************************************/
 
@@ -57,11 +57,25 @@ module.exports = function(grunt) {
                         ascii_only: true
                     }
                 }
+            },
+            compile: {
+                options: {
+                    //common options for all build files
+                },
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'src',
+                        src: ['**/*.build.json', '**/*.build.js'],
+                        dest: 'build'
+                    }
+                ]
             }
         }
     });
 
     grunt.registerTask('default', ['concat', 'uglify']);
     grunt.registerTask('r', ['requirejs:compileJS']);
+    grunt.registerTask('re', ['requirejs:compile']);
 
 };

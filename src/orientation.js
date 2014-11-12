@@ -2,12 +2,12 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2014-10-28 17:22]
+*     Last Modified       :     [2014-11-12 18:09]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
 
-define(['./util'], function(util) {
+define(['util'], function(util) {
     /**
      * Orientation会持续的取得移动设备的alpha, beta, gamma的值。
      * @module Orientation

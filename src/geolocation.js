@@ -2,11 +2,11 @@
 *     File Name           :     src/geolocation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-10 17:49]
-*     Last Modified       :     [2014-10-28 17:02]
+*     Last Modified       :     [2014-11-12 18:09]
 *     Description         :     地理位置获取接口
 ********************************************************************************/
 
-define(['./util'], function(util) {
+define(['util'], function(util) {
     /**
      * 获取用户设备GPS定位经纬度。
      * @module Geolocation

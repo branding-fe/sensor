@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-11 12:52]
+*     Last Modified       :     [2014-11-12 18:17]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -139,11 +139,20 @@ define(['util', 'wave'], function(util, wave) {
             this.eraseCoverImage.style.zIndex = 4;
             this.eraseCoverImage.addEventListener(startEvent, function(e) {
                 that.maskedDom.removeChild(that.eraseCoverImage);
+                if (configs.eraseCoverText) {
+                    that.maskedDom.removeChild(that.airIndexTip);
+                }
                 that.eraseImage.style[transformStr] = 'rotate(' + angle + 'deg)';
                 that._isEraseCovered = false;
                 that.startErase(e);
             }, false);
             this.eraseCoverImage.addEventListener(moveEvent, this, false);
+            this.eraseCoverImage.addEventListener(endEvent, this, false);
+        }
+
+        // 创建指数tip文本
+        if (configs.eraseCoverText) {
+            this.airIndexTip = this.buildAirIndexTip(width / 2 , height / 2, configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
         }
 
 
@@ -757,6 +766,47 @@ define(['util', 'wave'], function(util, wave) {
     };
 
     /**
+     * 创建一个在浮在canvas上面的DOM元素
+     * @param {string=|Element=} tag DOM标签或DOM对象 默认div
+     * @param {number} x DOM元素放置的中心x点
+     * @param {number} y DOM元素放置的中心y点
+     * @param {number} w DOM元素宽度
+     * @param {number} h DOM元素高度
+     * @param {Function=} onBeforeAppend 元素插入前的回调
+     * @return {Element} DOM对象
+     * @private
+     */
+    ErasableMask.prototype.createFloatDom = function (tag, x, y, w, h, onBeforeAppend, zIndex) {
+        var dom;
+        var cssStr;
+        if (!tag) {
+            tag = 'div';
+        }
+        if (util.isString(tag)) {
+            dom = document.createElement(tag);
+        }
+        else {
+            dom = tag;
+        }
+
+        var cssStr = 'position: absolute;';
+        cssStr += 'z-index: ' + (zIndex | 3) + ';';
+        cssStr += 'left: ' + (x - w / 2) + 'px;';
+        cssStr += 'top: ' + (y - h / 2) + 'px;';
+        cssStr += 'width: ' + w + 'px;';
+        cssStr += 'height: ' + h + 'px;';
+        dom.style.cssText += cssStr;
+
+
+        if (util.isFunction(onBeforeAppend)) {
+            onBeforeAppend(dom);
+        }
+
+        this.maskedDom.appendChild(dom);
+        return dom;
+    };
+
+    /**
      * 创建一个在浮在canvas上面的图片
      * @param {string|Element} src 图片地址或图片DOM对象
      * @param {number} x 图片放置的中心x点
@@ -769,24 +819,18 @@ define(['util', 'wave'], function(util, wave) {
     ErasableMask.prototype.createFloatImage = function (src, x, y, w, h) {
         var img;
         var cssStr;
-        if (util.isString(src)) {
-            img = document.createElement('div');
-            var cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
+        var domTag = 'div';
+        if (!util.isString(src)) {
+            domTag = src;
         }
-        else {
-            img = src;
-        }
+        img = this.createFloatDom(domTag, x, y, w, h, function(dom) {
+            if (util.isString(src)) {
+                var cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
+                cssStr += 'background-size: 100% 100%;';
+                dom.style.cssText += cssStr;
+            }
+        }, 3);
 
-        cssStr += 'background-size: 100% 100%;';
-        cssStr += 'position: absolute;';
-        cssStr += 'z-index: 3;';
-        cssStr += 'left: ' + (x - w / 2) + 'px;';
-        cssStr += 'top: ' + (y - h / 2) + 'px;';
-        cssStr += 'width: ' + w + 'px;';
-        cssStr += 'height: ' + h + 'px;';
-        img.style.cssText += cssStr;
-
-        this.maskedDom.appendChild(img);
         return img;
     };
 
@@ -835,6 +879,28 @@ define(['util', 'wave'], function(util, wave) {
         run();
     };
 
+    /**
+     * 创建空气指数tip
+     * @param {number} x tip元素放置的中心x点
+     * @param {number} y tip元素放置的中心y点
+     * @param {number} w tip元素宽度
+     * @param {number} h tip元素高度
+     * @return this
+     */
+    ErasableMask.prototype.buildAirIndexTip = function (x, y, w, h) {
+        var configs = this._configs;
+        var airIndex = configs.eraseCoverText;
+        var tip = this.createFloatDom('div', x, y + h + 20, w, h, function(dom) {
+            var cssStr = 'font-size: 17px; color: #235cf9; text-align: center;';
+            cssStr += 'line-height: 21px;';
+            dom.style.cssText += cssStr;
+            dom.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px;">空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 20px;font-weight: bold;">' + airIndex +
+                    '<i style="display: inline-block; min-width: 60px; line-height: 16px;height: 16px; color: #fff; background-color: #235cf9;' +
+                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 12px;font-weight: normal;">' +
+                    configs.eraseCoverTextDesc + '</i></p>';
+        }, 4);
+        return tip;
+    };
 
     return ErasableMask;
 });
