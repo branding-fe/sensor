@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-12 18:17]
+*     Last Modified       :     [2014-11-14 17:43]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -90,8 +90,8 @@ define(['util', 'wave'], function(util, wave) {
         var cssStr = 'background-color: transparent;';
         cssStr += 'position: absolute;';
         cssStr += 'z-index: 2;';
-        cssStr += 'left: ' + this._configs.left + ';';
-        cssStr += 'top: ' + this._configs.top + ';';
+        cssStr += 'left: ' + this._configs.left + 'px;';
+        cssStr += 'top: ' + this._configs.top + 'px;';
         if (this._configs.alpha) {
             cssStr += 'opacity: ' + this._configs.alpha / 100 + ';';
         }
@@ -119,9 +119,9 @@ define(['util', 'wave'], function(util, wave) {
         var transformStr = util.setCssPrefix('transform');
 
         var width = configs.width ? configs.width :
-                    mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRight);
+                    mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRightWidth);
         var height = configs.height ? configs.height :
-                     mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottom);
+                     mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottomWidth);
 
         // 处理刷子图片
         if (configs.eraseImage) {
@@ -139,6 +139,7 @@ define(['util', 'wave'], function(util, wave) {
             this.eraseCoverImage.style.zIndex = 4;
             this.eraseCoverImage.addEventListener(startEvent, function(e) {
                 that.maskedDom.removeChild(that.eraseCoverImage);
+                that.maskedDom.removeChild(that.eraseCoverImageBg);
                 if (configs.eraseCoverText) {
                     that.maskedDom.removeChild(that.airIndexTip);
                 }
@@ -148,6 +149,40 @@ define(['util', 'wave'], function(util, wave) {
             }, false);
             this.eraseCoverImage.addEventListener(moveEvent, this, false);
             this.eraseCoverImage.addEventListener(endEvent, this, false);
+
+            // 发光波纹
+            this.eraseCoverImageBg = this.createFloatDom('div', width / 2 , height / 2,
+                                       80, 80, function (dom) {
+                var sensorAddStyle = document.createElement('style');
+                var sState = 'width:80px;height:80px;left:' + (width / 2 - 40) + 'px;' +
+                            'top:' + (height / 2 - 40) + 'px;opacity: 0.4;border-radius:40px;';
+                var mState = 'width:80px;height:80px;left:' + (width / 2 - 40) + 'px;' +
+                            'top:' + (height / 2 - 40) + 'px;opacity: 0;border-radius:40px;';
+                var eState = 'width:150px;height:150px;left:' + (width / 2 - 75) + 'px; ' +
+                            'top:' + (height / 2 - 75) + 'px;opacity: 0;border-radius:75px;';
+                sensorAddStyle.innerHTML = '@-webkit-keyframes sensorCoverBigger {' +
+                        '0%{' + sState + '}' +
+                        '90%{' + eState + '}' +
+                        '95%{' + mState + '}' +
+                        '100%{' + sState + '}}' +
+                        '@-moz-keyframes sensorCoverBigger {' +
+                        '0%{' + sState + '}' +
+                        '90%{' + eState + '}' +
+                        '95%{' + mState + '}' +
+                        '100%{' + sState + '}}' +
+                        '@keyframes sensorCoverBigger {' +
+                        '0%{' + sState + '}' +
+                        '90%{' + eState + '}' +
+                        '95%{' + mState + '}' +
+                        '100%{' + sState + '}}';
+                document.head.appendChild(sensorAddStyle);
+                var cssStr = 'z-index: 3;background-color: #20b9e4; opacity: 0.4;border-radius:50px;';
+                cssStr += '-webkit-animation:sensorCoverBigger 2s 1s forwards linear infinite;';
+                cssStr += '-moz-animation:sensorCoverBigger 2s 1s forwards linear infinite;';
+                cssStr += 'animation:sensorCoverBigger 2s 1s forwards linear infinite;';
+                dom.style.cssText += cssStr;
+            });
+            this.eraseCoverImage.style.zIndex = 4;
         }
 
         // 创建指数tip文本
@@ -158,14 +193,19 @@ define(['util', 'wave'], function(util, wave) {
 
         // 处理logo图片 // customize
         if (configs.logoImage) {
-            this.logoImage = document.createElement('div');
-            var cssStr = 'background-image: url(' + configs.logoImage + ');background-repeat: no-repeat;';
-            cssStr += 'background-size: 100% 100%;';
-            cssStr += 'position: absolute;';
-            cssStr += 'z-index: 1;';
-            cssStr += configs.logoStyle;
-            this.logoImage.style.cssText += cssStr;
-            this.maskedDom.appendChild(this.logoImage);
+            if (util.isString(configs.logoImage)) {
+                this.logoImage = document.createElement('div');
+                var cssStr = 'background-image: url(' + configs.logoImage + ');background-repeat: no-repeat;';
+                cssStr += 'background-size: 100% 100%;';
+                cssStr += 'position: absolute;';
+                cssStr += 'z-index: 1;';
+                cssStr += configs.logoStyle;
+                this.logoImage.style.cssText += cssStr;
+                this.maskedDom.appendChild(this.logoImage);
+            }
+            else  {
+                this.logoImage = configs.logoImage;
+            }
             this._logoLeft = this.logoImage.offsetLeft;
             this._logoTop = this.logoImage.offsetTop;
 
@@ -336,7 +376,6 @@ define(['util', 'wave'], function(util, wave) {
         if (this._isEraseCovered) {
             return;
         }
-        console.log(event.type);
         switch (event.type) {
             case startEvent:
                 return this.startErase(event);
@@ -397,7 +436,7 @@ define(['util', 'wave'], function(util, wave) {
                 ctx.fillStyle = '#000';
             }
             // 圆
-            else if (this._configs.radius) {
+            else if (eraseRadius) {
                 this.eraseCircle(ctx, x, y, eraseRadius, this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
             }
@@ -649,8 +688,8 @@ define(['util', 'wave'], function(util, wave) {
                 }
             }
         }
-        console.log(inTimes);
-        console.log(caTimes);
+        //console.log(inTimes);
+        //console.log(caTimes);
 
         var transCount = 0;
         for (var k = 0; k < pointsLen; k++) {
@@ -890,13 +929,13 @@ define(['util', 'wave'], function(util, wave) {
     ErasableMask.prototype.buildAirIndexTip = function (x, y, w, h) {
         var configs = this._configs;
         var airIndex = configs.eraseCoverText;
-        var tip = this.createFloatDom('div', x, y + h + 20, w, h, function(dom) {
-            var cssStr = 'font-size: 17px; color: #235cf9; text-align: center;';
+        var tip = this.createFloatDom('div', x, y + h - 20, w, h, function(dom) {
+            var cssStr = 'font-size: 17px; color: #0996d1; text-align: center;';
             cssStr += 'line-height: 21px;';
             dom.style.cssText += cssStr;
             dom.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px;">空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 20px;font-weight: bold;">' + airIndex +
-                    '<i style="display: inline-block; min-width: 60px; line-height: 16px;height: 16px; color: #fff; background-color: #235cf9;' +
-                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 12px;font-weight: normal;">' +
+                    '<i style="display: inline-block; min-width: 50px; line-height: 16px;height: 16px; color: #fff; background-color: #0996d1;' +
+                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 12px;font-weight: normal;vertical-align: top;margin-top: 2px;padding: 0 5px;">' +
                     configs.eraseCoverTextDesc + '</i></p>';
         }, 4);
         return tip;

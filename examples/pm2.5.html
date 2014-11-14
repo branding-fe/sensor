@@ -2,7 +2,7 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-12 18:28]
+*     Last Modified       :     [2014-11-14 17:49]
 *     Description         :     erase part of mask
 *******************************************************************************-->
 
@@ -12,7 +12,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Erasable Mask</title>
-    <script type="text/javascript" src="../src/require.js"></script>
+    <!--<script type="text/javascript" src="../src/require.js"></script>-->
+    <script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-8-6/esl.min.js"></script>
     <style>
     body {
         padding: 0;
@@ -33,18 +34,28 @@
         font-size: 14px;
         z-index: 100;
     }
+    #logo {
+        position: absolute;
+        width: 44px;
+        height: 25px;
+        top: 47px;
+        right: 17px;
+    }
     </style>
 </head>
 <body>
 <div id="imgWrap">
+    <img id="logo" src="http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png" />
     <img class="originCont" src="../images/pm2.5/pm_bg.jpg" />
     <div id="percentDom"></div>
 </div>
-<script type="text/javascript" src="http://dev046.baidu.com:8096/build/erasableMask.js"></script>
 <script>
-//require.config({
-//    baseUrl: '../src'
-//});
+require.config({
+    baseUrl: '../src'
+    //paths: {
+    //    'erasableMask': 'http://bs.baidu.com/public01/bcs-sensor/build/erasableMask'
+    //}
+});
 require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
@@ -69,7 +80,7 @@ require(['erasableMask'], function(Mask) {
 
     var perStr;
     // var perDom = document.getElementById('percentDom');
-    var mask = new Mask('imgWrap', {
+    var mask = new Mask(document.body, {
         //alpha: 65,
         alphaRadius: 10,
         radius: 100,
@@ -84,7 +95,7 @@ require(['erasableMask'], function(Mask) {
         eraseCoverImageHeight: 196,
         eraseCoverText: airIndex,
         eraseCoverTextDesc: airIndexText,
-        logoImage: logoImg,
+        logoImage: document.getElementById('logo'),
         logoClickStart: true,
         logoStyle: 'width: 44px; height: 25px; top: 47px; right: 17px;',
         maskImage: maskImage,
@@ -140,7 +151,7 @@ require(['erasableMask'], function(Mask) {
         }
     }
 
-})();
+});
 </script>
 </body>
 </html>

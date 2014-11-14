@@ -2,7 +2,7 @@
 *     File Name           :     Gruntfile.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-28 18:08]
-*     Last Modified       :     [2014-11-12 18:22]
+*     Last Modified       :     [2014-11-13 13:55]
 *     Description         :     Gruntfile
 ********************************************************************************/
 
@@ -66,7 +66,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         cwd: 'src',
-                        src: ['**/*.build.json', '**/*.build.js'],
+                        src: ['*.build.json'],
                         dest: 'build'
                     }
                 ]
