@@ -2,7 +2,7 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-14 17:49]
+*     Last Modified       :     [2014-11-17 16:05]
 *     Description         :     erase part of mask
 *******************************************************************************-->
 
@@ -13,6 +13,7 @@
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Erasable Mask</title>
     <!--<script type="text/javascript" src="../src/require.js"></script>-->
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-8-6/esl.min.js"></script>
     <style>
     body {
@@ -41,12 +42,63 @@
         top: 47px;
         right: 17px;
     }
+    .bg_selector {
+        top: 5px;
+        left: 5px;
+        position: absolute;
+        z-index: 100;
+        width: 270px;
+        height: 20px;
+        padding: 5px;
+        background: #eee;
+        border: 1px solid #aaa;
+    }
+    .bg_selector span {
+        cursor: pointer;
+        float: left;
+        width: 40px;
+        height: 20px;
+        text-align: center;
+        color: #fff;
+        margin-right: 5px;
+    }
+    .bg_selector span.selected {
+        width: 38px;
+        height: 18px;
+        border: 1px solid #333;
+    }
+    #idx14 {
+        background-color: #35a3f7;
+    }
+    #idx64 {
+        background-color: #3b93ff;
+    }
+    #idx124 {
+        background-color: #70a4d4;
+    }
+    #idx184 {
+        background-color: #849ab0;
+    }
+    #idx234 {
+        background-color: #8a8b84;
+    }
+    #idx434 {
+        background-color: #748084;
+    }
     </style>
 </head>
 <body>
+<div class="bg_selector">
+    <span id="idx14" index='1'>14</span>
+    <span index='2' id="idx64">64</span>
+    <span index='3' id="idx124">124</span>
+    <span index='4' id="idx184">184</span>
+    <span index='5' id="idx234">234</span>
+    <span index='6' id="idx434">434</span>
+</div>
 <div id="imgWrap">
     <img id="logo" src="http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png" />
-    <img class="originCont" src="../images/pm2.5/pm_bg.jpg" />
+    <img class="originCont" src="../images/pm2.5/pm_bg_1.jpg" />
     <div id="percentDom"></div>
 </div>
 <script>
@@ -57,10 +109,54 @@ require.config({
     //}
 });
 require(['erasableMask'], function(Mask) {
+    var bgImg = $('.originCont');
+    function getIdxText(idx) {
+        if (idx >= 300) {
+            return '严重污染';
+        }
+        if (idx >= 200) {
+            return '重度污染';
+        }
+        if (idx >= 150) {
+            return '中度污染';
+        }
+        if (idx >= 100) {
+            return '轻度污染';
+        }
+        if (idx >= 50) {
+            return '良';
+        }
+        if (idx >= 0) {
+            return '优';
+        }
+        return '不知道';
+    }
+    function getOpacity(idx) {
+        if (idx <= 50) {
+            return 20;
+        }
+        if (idx >= 350) {
+            return 100;
+        }
+        return 100 - (350 - idx) * (80 / 300);
+    }
+    $('.bg_selector span').click(function() {
+        var curDom = $(this);
+        $('.bg_selector span').removeClass('selected');
+        curDom.addClass('selected');
+        var idx = curDom.html();
+        var text = getIdxText(idx);
+        bgImg.attr('src', '../images/pm2.5/pm_bg_' + curDom.attr('index') + '.jpg');
+        if (mask.airIndexTip) {
+            mask.buildAirIndexText(idx, text);
+            mask.setOpacity(getOpacity(idx));
+        }
+    });
+
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
-    var maskImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_fog.png';
+    var maskImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_fog_big.png';
     var bottleImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_bottle.png';
     var coverImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_tip.png';
     var logoImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png';
@@ -73,15 +169,12 @@ require(['erasableMask'], function(Mask) {
         airIndex = hrefIndex[1];
     }
 
-    if (airIndex >= 200) {
-        maskImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_fog_big.png';
-        airIndexText = '重度污染';
-    }
+    airIndexText = getIdxText(airIndex);
 
     var perStr;
     // var perDom = document.getElementById('percentDom');
     var mask = new Mask(document.body, {
-        //alpha: 65,
+        alpha: getOpacity(airIndex),
         alphaRadius: 10,
         radius: 100,
         eraseWidth: 50,

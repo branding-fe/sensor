@@ -1,0 +1,159 @@
+<!--******************************************************************************
+*     File Name           :     examples/pm2.5.bare.html
+*     Created By          :     DestinyXie
+*     Creation Date       :     [2014-11-18 10:51]
+*     Last Modified       :     [2014-11-18 18:23]
+*     Description         :     load by script tag
+*******************************************************************************-->
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Erasable Mask</title>
+    <script type="text/javascript" src="../src/require.js"></script>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!--<script src="http://bs.baidu.com/public01/bcs-sensor/src/erasePM25Mask-built.js"></script>-->
+    <style>
+    body {
+        padding: 0;
+        margin: 0;
+        height: 1000px;
+    }
+    #imgWrap {
+        width: 100%;
+        position: relative;
+    }
+    .originCont {
+        width: 100%;
+    }
+    #percentDom {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        color: #111;
+        font-size: 14px;
+        z-index: 100;
+    }
+    #logo {
+        position: absolute;
+        width: 44px;
+        height: 25px;
+        top: 47px;
+        right: 17px;
+    }
+    .bg_selector {
+        top: 5px;
+        left: 5px;
+        position: absolute;
+        z-index: 100;
+        width: 270px;
+        height: 20px;
+        padding: 5px;
+        background: #eee;
+        border: 1px solid #aaa;
+        box-shadow: 2px 2px 15px #000;
+    }
+    .bg_selector span {
+        cursor: pointer;
+        float: left;
+        width: 40px;
+        height: 20px;
+        text-align: center;
+        color: #fff;
+        margin-right: 5px;
+    }
+    .bg_selector span.selected {
+        width: 38px;
+        height: 18px;
+        border: 1px solid #333;
+    }
+    #idx14 {
+        background-color: #35a3f7;
+    }
+    #idx64 {
+        background-color: #3b93ff;
+    }
+    #idx124 {
+        background-color: #70a4d4;
+    }
+    #idx184 {
+        background-color: #849ab0;
+    }
+    #idx234 {
+        background-color: #8a8b84;
+    }
+    #idx434 {
+        background-color: #748084;
+    }
+    </style>
+</head>
+<body>
+<div class="bg_selector">
+    <span id="idx14" index='1'>14</span>
+    <span index='2' id="idx64">64</span>
+    <span index='3' id="idx124">124</span>
+    <span index='4' id="idx184">184</span>
+    <span index='5' id="idx234">234</span>
+    <span index='6' id="idx434">434</span>
+</div>
+<div id="imgWrap">
+    <div id="logo"></div>
+    <img class="originCont" src="../images/pm2.5/pm_bg_1.jpg" />
+    <div id="percentDom"></div>
+</div>
+<script>
+require.config({
+    baseUrl: '../src'
+});
+require(['erasePM25Mask'], function(genMask) {
+    // 根据质量指数生成相应的文字
+    function getIdxText(idx) {
+        if (idx >= 300) {
+            return '严重污染';
+        }
+        if (idx >= 200) {
+            return '重度污染';
+        }
+        if (idx >= 150) {
+            return '中度污染';
+        }
+        if (idx >= 100) {
+            return '轻度污染';
+        }
+        if (idx >= 50) {
+            return '良';
+        }
+        if (idx >= 0) {
+            return '优';
+        }
+        return '不知道';
+    }
+
+    // TEST从url上获取空气质量指数
+    var hrefIndex = /\airIndex=(\d+)/.exec(location.href);
+    if (hrefIndex && hrefIndex.length > 1) {
+        airIndex = hrefIndex[1];
+    }
+
+    airIndexText = getIdxText(airIndex);
+
+    // TEST 选择背景
+    $('.bg_selector span').click(function() {
+        var curDom = $(this);
+        $('.bg_selector span').removeClass('selected');
+        curDom.addClass('selected');
+        var idx = curDom.html();
+        var text = getIdxText(idx);
+        $('.originCont').attr('src', '../images/pm2.5/pm_bg_' + curDom.attr('index') + '.jpg');
+    });
+
+
+    // 仅需此处调用 pm25的值，污染文字，logo dom或其id
+    genMask(airIndex, airIndexText, 'logo');
+
+});
+</script>
+</body>
+</html>
