@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-11-06 10:14]
+*     Last Modified       :     [2014-11-19 15:29]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -111,6 +111,20 @@ define(function() {
         return object;
     };
 
+
+    /**
+     * @type {Function}
+     * @param {Element} dom 传入的DOM相关的内容
+     * @return {Array}
+     * 根据输入内容返回DOM元素，传入字符串就作为DOM的id，传入DOM元素相对body左上角的偏移量
+     */
+    var getOffset = function (dom) {
+        if (isString(object)) {
+            return document.getElementById(object);
+        }
+        return object;
+    };
+
     /**
      * 将源对象的所有属性拷贝到目标对象中
      * 1.目标对象中，与源对象key相同的成员默认将会被覆盖。
@@ -160,6 +174,8 @@ define(function() {
         isArray: isArray,
         /** 获取DOM对象，传入字符型时做为id处理 */
         getElement: getElement,
+        /** 获取DOM对象相对body左上角的偏移量，传入字符型时做为id处理 */
+        getOffset: getOffset,
         /** 将源对象的所有属性拷贝到目标对象中 */
         extend: extend
     };

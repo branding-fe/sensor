@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-18 18:35]
+*     Last Modified       :     [2014-11-19 18:25]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -93,7 +93,7 @@ define(['util', 'wave'], function(util, wave) {
                     mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRightWidth);
         var height = configs.height ? configs.height :
                      mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottomWidth);
-        if (this.maskedDom == document.body) {
+        if (this.maskedDom === document.body) {
             this.maskWidth = width;
             this.maskHeight = height;
             this.calculHeight = viewHeight;
@@ -154,9 +154,6 @@ define(['util', 'wave'], function(util, wave) {
 
         this.detectViewport();
 
-        var width = this.maskWidth;
-        var height = this.calculHeight;
-
         // 处理刷子图片
         if (configs.eraseImage) {
             this.createEraseImage();
@@ -168,17 +165,29 @@ define(['util', 'wave'], function(util, wave) {
 
         // 创建指数tip文本
         if (configs.eraseCoverText) {
-            this.airIndexTip = this.buildAirIndexTip(width / 2 , this.calculHeight / 2, configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
+            this.airIndexTip = this.buildAirIndexTip(this.maskWidth / 2 , this.calculHeight / 2, configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
             this.buildAirIndexText(configs.eraseCoverText, configs.eraseCoverTextDesc);
         }
-
 
         // 处理logo图片 // customize
         if (configs.logoImage) {
             this.handleLogo();
         }
 
-        this.maskCanvas.width = width;
+        this.setMaskSize(cb);
+
+    };
+
+    /**
+     * 设置遮罩的尺寸
+     * @private
+     */
+    ErasableMask.prototype.setMaskSize = function (cb) {
+        var that = this;
+        var mDom = this.maskedDom;
+        var configs = this._configs;
+
+        this.maskCanvas.width = this.maskWidth;
         this.maskCanvas.height = this.maskHeight;
         var mDomRectRect = mDom.getBoundingClientRect();
         this._offsetX = mDomRectRect.left + document.body.scrollLeft + mDom.clientLeft;
@@ -192,7 +201,7 @@ define(['util', 'wave'], function(util, wave) {
             img.style.display = 'none';
             document.body && document.body.appendChild(img);
             img.addEventListener('load', function() {
-                ctx.drawImage(img, 0, 0, width, that.maskHeight);
+                ctx.drawImage(img, 0, 0, that.maskWidth, that.maskHeight);
                 ctx.globalCompositeOperation = 'destination-out';
                 document.body && document.body.removeChild(img);
                 img = null;
@@ -206,16 +215,16 @@ define(['util', 'wave'], function(util, wave) {
                     that.isTainted = true;
                 }
 
-                cb(ctx);
-            });
+                cb && cb(ctx);
+            }, false);
         }
         else {
             ctx.fillStyle = configs.color;
-            ctx.fillRect(0, 0, width, this.maskHeight);
+            ctx.fillRect(0, 0, this.maskWidth, this.maskHeight);
             this.generateCheckPoints();
             ctx.globalCompositeOperation = 'destination-out';
 
-            cb(ctx);
+            cb && cb(ctx);
         }
     };
 
@@ -268,38 +277,54 @@ define(['util', 'wave'], function(util, wave) {
         // 发光波纹
         this.eraseCoverImageBg = this.createFloatDom('div', width / 2 , height / 2,
                                    80, 80, function (dom) {
-            var sensorAddStyle = document.createElement('style');
-            var sState = 'width:80px;height:80px;left:' + (width / 2 - 40) + 'px;' +
-                        'top:' + (height / 2 - 40) + 'px;opacity: 0.4;border-radius:40px;';
-            var mState = 'width:80px;height:80px;left:' + (width / 2 - 40) + 'px;' +
-                        'top:' + (height / 2 - 40) + 'px;opacity: 0;border-radius:40px;';
-            var eState = 'width:150px;height:150px;left:' + (width / 2 - 75) + 'px; ' +
-                        'top:' + (height / 2 - 75) + 'px;opacity: 0;border-radius:75px;';
-            sensorAddStyle.innerHTML = '@-webkit-keyframes sensorCoverBigger {' +
-                    '0%{' + sState + '}' +
-                    '90%{' + eState + '}' +
-                    '95%{' + mState + '}' +
-                    '100%{' + sState + '}}' +
-                    '@-moz-keyframes sensorCoverBigger {' +
-                    '0%{' + sState + '}' +
-                    '90%{' + eState + '}' +
-                    '95%{' + mState + '}' +
-                    '100%{' + sState + '}}' +
-                    '@keyframes sensorCoverBigger {' +
-                    '0%{' + sState + '}' +
-                    '90%{' + eState + '}' +
-                    '95%{' + mState + '}' +
-                    '100%{' + sState + '}}';
-            document.head.appendChild(sensorAddStyle);
+            that.createAnim(dom, width / 2, height / 2);
             var cssStr = 'z-index: 3;background-color: #20b9e4; opacity: 0.4;border-radius:50px;';
-            cssStr += '-webkit-animation:sensorCoverBigger 2s 1s forwards linear infinite;';
-            cssStr += '-moz-animation:sensorCoverBigger 2s 1s forwards linear infinite;';
-            cssStr += 'animation:sensorCoverBigger 2s 1s forwards linear infinite;';
             dom.style.cssText += cssStr;
         });
         this.eraseCoverImage.style.zIndex = 4;
     };
 
+
+    /**
+     * 创建发光波纹的动画
+     * @private
+     */
+    ErasableMask.prototype.createAnim = function (dom, x, y) {
+        if (this.preStyleDom) {
+            document.head.removeChild(this.preStyleDom);
+        }
+        var sensorAddStyle = document.createElement('style');
+        var sState = 'width:80px;height:80px;left:' + (x - 40) + 'px;' +
+                    'top:' + (y - 40) + 'px;opacity: 0.4;border-radius:40px;';
+        var mState = 'width:80px;height:80px;left:' + (x - 40) + 'px;' +
+                    'top:' + (y - 40) + 'px;opacity: 0;border-radius:40px;';
+        var eState = 'width:150px;height:150px;left:' + (x - 75) + 'px; ' +
+                    'top:' + (y - 75) + 'px;opacity: 0;border-radius:75px;';
+
+        this.preStyleDom = sensorAddStyle;
+        this.preStyleIdx = this.preStyleIdx ? this.preStyleIdx + 1 : 1;
+
+        sensorAddStyle.innerHTML = '@-webkit-keyframes sensorCoverBigger' + this.preStyleIdx + ' {' +
+                '0%{' + sState + '}' +
+                '90%{' + eState + '}' +
+                '95%{' + mState + '}' +
+                '100%{' + sState + '}}' +
+                '@-moz-keyframes sensorCoverBigger {' +
+                '0%{' + sState + '}' +
+                '90%{' + eState + '}' +
+                '95%{' + mState + '}' +
+                '100%{' + sState + '}}' +
+                '@keyframes sensorCoverBigger {' +
+                '0%{' + sState + '}' +
+                '90%{' + eState + '}' +
+                '95%{' + mState + '}' +
+                '100%{' + sState + '}}';
+        var cssStr = '-webkit-animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
+            cssStr += '-moz-animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
+            cssStr += 'animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
+        dom.style.cssText += cssStr;
+        document.head.appendChild(sensorAddStyle);
+    };
     /**
      * 处理logo customize
      * @private
@@ -316,16 +341,26 @@ define(['util', 'wave'], function(util, wave) {
             }
             var cssStr = 'background-image: url(' + configs.logoImage + ');background-repeat: no-repeat;';
             cssStr += 'background-size: 100% 100%;';
-            cssStr += 'position: absolute;';
-            cssStr += 'z-index: 1;';
             this.logoImage.style.cssText += cssStr;
-            this.maskedDom.appendChild(this.logoImage);
+            if (configs.logoLink) {
+                var logoImageStyle = getComputedStyle(this.logoImage);
+                if ('absolute' !== logoImageStyle.position && 'relative' !== logoImageStyle.position) {
+                    this.logoImage.style.position = 'relative';
+                }
+                var link = document.createElement('a');
+                link.href = configs.logoLink;
+                link.style.cssText = 'position:absolute;width:100%;height:100%;'
+                this.logoImage.appendChild(link);
+            }
+            if (!configs.logoDom) {
+                this.maskedDom.appendChild(this.logoImage);
+            }
         }
         else  {
             this.logoImage = configs.logoImage;
         }
         this._logoLeft = this.logoImage.offsetLeft;
-        this._logoTop = this.logoImage.offsetTop;
+        this._logoTop = this.logoImage.offsetTop + 106; // hot fix
 
         var that = this;
         if (this._configs.logoClickStart) {
@@ -340,9 +375,49 @@ define(['util', 'wave'], function(util, wave) {
      * @return this
      */
     ErasableMask.prototype.refreshMaskSize = function () {
+        var configs = this._configs;
         this.detectViewport();
-        // TODO
+        this.setMaskSize();
 
+
+        var width = this.maskWidth;
+        var height = this.calculHeight;
+
+        // 处理刷子图片
+        if (this.eraseImage) {
+            this.eraseImage.style.left = (width - configs.eraseImageWidth) / 2 + 'px';
+            this.eraseImage.style.top = (height - configs.eraseImageHeight) / 2 + 'px';
+        }
+
+        // 处理刷子Cover图片
+        if (this.eraseCoverImage) {
+            this.eraseCoverImage.style.left = (width - configs.eraseCoverImageWidth) / 2 + 'px';
+            this.eraseCoverImage.style.top = (height - configs.eraseCoverImageHeight) / 2 + 'px';
+        }
+
+        // 处理刷子Cover图片 背景波纹
+        if (this.eraseCoverImageBg) {
+            this.eraseCoverImageBg.style.left = (width / 2 - 40) + 'px';
+            this.eraseCoverImageBg.style.top = (height / 2 - 40) + 'px';
+            this.createAnim(this.eraseCoverImageBg, width / 2, height / 2);
+        }
+
+        // 处理指数tip文本
+        if (this.airIndexTip) {
+            this.airIndexTip.style.left = (width - configs.eraseCoverImageWidth) / 2 + 'px';
+            this.airIndexTip.style.top = ((height + configs.eraseCoverImageHeight) / 2 - 20) + 'px';
+        }
+
+        // 处理logo图片 // customize
+        if (this.logoImage) {
+            this._logoLeft = this.logoImage.offsetLeft;
+            this._logoTop = this.logoImage.offsetTop;
+        }
+
+        if (this._configs.logoImage) {
+            this._logoLeft = this.logoImage.offsetLeft;
+            this._logoTop = this.logoImage.offsetTop;
+        }
         return this;
     };
 
@@ -676,7 +751,7 @@ define(['util', 'wave'], function(util, wave) {
     ErasableMask.prototype.generateCheckPoints = function () {
         this.checkPoints = [];
         var canvasW = this.maskCanvas.width;
-        var canvasH = this._configs.calculHeight || this.maskCanvas.height;
+        var canvasH = this.calculHeight;
         var step = this._configs.checkDistance;
         var xPoints = Math.ceil(canvasW / step);
         var yPoints = Math.ceil(canvasH / step);
@@ -1005,7 +1080,7 @@ define(['util', 'wave'], function(util, wave) {
             }
             else {
                 toAngle = toAngle >= 360 ? 0 : toAngle + 20;
-                cssStr = "left:" + (curX + (toX - curX) * easing(p)) + 'px;' +
+                cssStr = "left:" + (curX + (toX - curX) * easing(p) + 20) + 'px;' +
                          "top:" + (curY + (toY - curY) * easing(p)) + 'px;' +
                          "width:" + oriW * (1 - easing(p)) + 'px;' +
                          "height:" + oriH * (1 - easing(p)) + 'px';

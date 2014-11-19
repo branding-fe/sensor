@@ -2,12 +2,25 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-11-18 17:58]
+*     Last Modified       :     [2014-11-19 18:09]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
-
 define(['erasableMask'], function(Mask) {
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?d7cdf65b6ea89fd0a30a2e7b1fe7448c";
+        var parent = (document.head || document.getElementsByTagName('head')[0] || document.body);
+        parent.insertBefore(hm, parent.firstChild);
+    })();
+
+    /**
+    * 百度统计
+    */
+    function bd_tongji(cat, action, label) {
+        _hmt.push(['_trackEvent', cat, action, label]);
+    }
+
     // 根据质量指数设置雾霾透明度
     function getOpacity(idx) {
         if (idx <= 50) {
@@ -65,16 +78,32 @@ define(['erasableMask'], function(Mask) {
     }
 
 
-
+    var generated = false;
     function generateMask (airIdx, airText, logoDom) {
+        if (generated) {
+            return;
+        }
+        generated = true;
+
+        setTimeout(function() { // 等待统计代码加载完
+            bd_tongji('wise-pm2.5-20141119', 'mobile', 'open');
+        }, 200);
         if (airText != '优' && airText != '良') {
             airText += '污染';
         }
+
+        window.addEventListener('resize', function() {
+            if (!mask.maskCanvas) {
+                return;
+            }
+            mask.refreshMaskSize();
+        }, false);
+
         // 第一个参数为被遮罩的DOM元素或DOM元素id
         mask = new Mask(document.body, {
             alpha: getOpacity(airIdx), // 雾霾透明度
             alphaRadius: 10, // 擦除雾霾时的边缘模糊距离
-            radius: 100, // 计算擦除半径
+            radius: 80, // 计算擦除半径
             eraseWidth: 50, // 擦除宽度
             eraseHeight: 140, // 擦除高度
             angle: 45, // 擦除区块逆时针偏转角度
@@ -88,11 +117,13 @@ define(['erasableMask'], function(Mask) {
             eraseCoverTextDesc: airText, // 空气指数对应的文字
             logoDom: logoDom,
             logoImage: 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png', // logo图片
-            logoClickStart: true, // 是否点击logo重新生成遮罩
+            logoLink: 'http://ap.larocheposay.com.cn/mobile/index.html?utm_source=Baidu&utm_medium=alading&utm_term=&utm_content=&utm_campaign=lrp-ap-20141021',
+            logoClickStart: false, // 是否点击logo重新生成遮罩
             maskImage: maskImage, // 遮罩图片
             // color: '#ddd', // 纯色遮罩 用图片时不需要该配置
             // showPoint: true,
             onStart: function(x, y) { // 开始擦除，参数是开始擦除的部分相对遮罩的位置
+                bd_tongji('wise-pm2.5-20141119', 'mobile', 'start');
                 genRain(x - 10, y + 30, 14, 14, 4000, 400, 200);
                 genRain(x - 35, y + 20, 10, 10, 4000, 500, 1000);
             },
@@ -107,7 +138,6 @@ define(['erasableMask'], function(Mask) {
                     genRain(x + 20, y + 20, 9, 9, 5000, 500, 200);
                 }
                 if (percent >= 40) {
-
                     mask.clearMask(2000, stopRain);
                     mask.rotateEraseImage(2000, stopRain);
                     // perDom.innerHTML = '已清除全部遮罩';

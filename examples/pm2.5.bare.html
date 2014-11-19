@@ -2,7 +2,7 @@
 *     File Name           :     examples/pm2.5.bare.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 10:51]
-*     Last Modified       :     [2014-11-18 18:23]
+*     Last Modified       :     [2014-11-19 18:20]
 *     Description         :     load by script tag
 *******************************************************************************-->
 
@@ -12,9 +12,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Erasable Mask</title>
-    <script type="text/javascript" src="../src/require.js"></script>
+    <!--<script type="text/javascript" src="../src/require.js"></script>-->
     <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
-    <!--<script src="http://bs.baidu.com/public01/bcs-sensor/src/erasePM25Mask-built.js"></script>-->
+    <script src="http://bs.baidu.com/public01/bcs-sensor/src/erasePM25Mask-built.js"></script>
     <style>
     body {
         padding: 0;
@@ -104,9 +104,6 @@
     <div id="percentDom"></div>
 </div>
 <script>
-require.config({
-    baseUrl: '../src'
-});
 require(['erasePM25Mask'], function(genMask) {
     // 根据质量指数生成相应的文字
     function getIdxText(idx) {
