@@ -2,7 +2,7 @@
 *     File Name           :     examples/pm2.5.bare.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 10:51]
-*     Last Modified       :     [2014-11-20 14:36]
+*     Last Modified       :     [2014-11-20 15:25]
 *     Description         :     load by script tag
 *******************************************************************************-->
 
@@ -111,16 +111,16 @@ require(['erasePM25Mask'], function(genMask) {
     // 根据质量指数生成相应的文字
     function getIdxText(idx) {
         if (idx >= 300) {
-            return '严重污染';
+            return '严重';
         }
         if (idx >= 200) {
-            return '重度污染';
+            return '重度';
         }
         if (idx >= 150) {
-            return '中度污染';
+            return '中度';
         }
         if (idx >= 100) {
-            return '轻度污染';
+            return '轻度';
         }
         if (idx >= 50) {
             return '良';
@@ -131,7 +131,7 @@ require(['erasePM25Mask'], function(genMask) {
         return '不知道';
     }
     var airIndex = 130;
-    var airIndexText = '轻度污染';
+    var airIndexText = '轻度';
 
     // TEST从url上获取空气质量指数
     var hrefIndex = /\airIndex=(\d+)/.exec(location.href);

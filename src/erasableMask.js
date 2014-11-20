@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-20 14:34]
+*     Last Modified       :     [2014-11-20 17:42]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -1128,8 +1128,11 @@ define(['util', 'wave'], function(util, wave) {
         var configs = this._configs;
         var airIndex = configs.eraseCoverText;
         var that = this;
-        var tip = this.createFloatDom('div', x, y + h - 20, w, h, function(dom) {
-            var cssStr = 'font-size: 17px; color: #0996d1; text-align: center;';
+        var tip = this.createFloatDom('div', x, y + h / 2 + 10, w, 50, function(dom) {
+            var cssStr = 'font-size: 17px; color: #fff; text-align: center;';
+            cssStr += 'text-shadow: 1px 1px 1px #040000;';
+            cssStr += '-webkit-text-shadow: 1px 1px 1px #040000;';
+            cssStr += '-moz-text-shadow: 1px 1px 1px #040000;';
             cssStr += 'line-height: 21px;';
             dom.style.cssText += cssStr;
         }, 4);
@@ -1143,9 +1146,10 @@ define(['util', 'wave'], function(util, wave) {
      * @return this
      */
     ErasableMask.prototype.buildAirIndexText = function (value, desc) {
-        this.airIndexTip.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px;">空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 20px;font-weight: bold;">' + value +
+        this.airIndexTip.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px; font-size: 17px;">空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 24px;">' + value +
                     '<i style="display: inline-block; min-width: 50px; line-height: 16px;height: 16px; color: #fff; background-color: #0996d1;' +
-                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 12px;font-weight: normal;vertical-align: top;margin-top: 2px;padding: 0 5px;">' +
+                    'text-shadow: none;-webkit-text-shadow: none;-moz-text-shadow: none;' +
+                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 13px;font-weight: normal;vertical-align: top;margin-top: 2px;padding: 0 5px;">' +
                     desc + '</i></p>';
         return this;
     };
