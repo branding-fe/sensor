@@ -2,7 +2,7 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-11-19 18:09]
+*     Last Modified       :     [2014-11-20 14:41]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
@@ -14,22 +14,51 @@ define(['erasableMask'], function(Mask) {
         parent.insertBefore(hm, parent.firstChild);
     })();
 
+
+    /**
+    * 百度精算
+    */
+    function bd_jingsuan(url) {
+        var img = document.createElement('img');
+        img.src = url;
+        img.style.display = 'none';
+        document.body.appendChild(img);
+        img.addEventListener('load', function() {
+            document.body.removeChild(img);
+        });
+    }
+
     /**
     * 百度统计
     */
+    var tongjiHash = [];
+    var hashLen;
     function bd_tongji(cat, action, label) {
-        _hmt.push(['_trackEvent', cat, action, label]);
+        if (_hmt) {
+            _hmt.push(['_trackEvent', cat, action, label]);
+            hashLen = tongjiHash.length;
+            if (hashLen > 0) {
+                for (var i = 0; i < hashLen; i++) {
+                    _hmt.push(['_trackEvent', tongjiHash[i][0], tongjiHash[i][1], tongjiHash[i][2]]);
+                }
+                tongjiHash = [];
+            }
+        }
+        else {
+            tongjiHash.push([cat, action, label]);
+        }
     }
+
 
     // 根据质量指数设置雾霾透明度
     function getOpacity(idx) {
-        if (idx <= 50) {
-            return 20;
+        if (idx <= 200) {
+            return 70;
         }
         if (idx >= 350) {
             return 100;
         }
-        return 100 - (350 - idx) * (80 / 300);
+        return 100 - (350 - idx) * (30 / 300);
     }
 
 
@@ -85,6 +114,8 @@ define(['erasableMask'], function(Mask) {
         }
         generated = true;
 
+        bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=19ce4a28eb2d6bb027ef967003030c85&et=0');
+        bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=787912153e7e1e2592c9a2fa38943242&et=0');
         setTimeout(function() { // 等待统计代码加载完
             bd_tongji('wise-pm2.5-20141119', 'mobile', 'open');
         }, 200);
@@ -119,11 +150,15 @@ define(['erasableMask'], function(Mask) {
             logoImage: 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png', // logo图片
             logoLink: 'http://ap.larocheposay.com.cn/mobile/index.html?utm_source=Baidu&utm_medium=alading&utm_term=&utm_content=&utm_campaign=lrp-ap-20141021',
             logoClickStart: false, // 是否点击logo重新生成遮罩
+            onLogoClick: function() {
+                bd_jingsuan('http://click.hm.baidu.com/clk?572bf2137c2a77365bc2e58749f6d2d3');
+            },
             maskImage: maskImage, // 遮罩图片
             // color: '#ddd', // 纯色遮罩 用图片时不需要该配置
             // showPoint: true,
             onStart: function(x, y) { // 开始擦除，参数是开始擦除的部分相对遮罩的位置
                 bd_tongji('wise-pm2.5-20141119', 'mobile', 'start');
+                bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=9c66cd2cebcde14bb150850a6a625756&et=0');
                 genRain(x - 10, y + 30, 14, 14, 4000, 400, 200);
                 genRain(x - 35, y + 20, 10, 10, 4000, 500, 1000);
             },

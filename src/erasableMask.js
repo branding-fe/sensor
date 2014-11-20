@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-19 18:25]
+*     Last Modified       :     [2014-11-20 14:34]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -263,7 +263,7 @@ define(['util', 'wave'], function(util, wave) {
             that.maskedDom.removeChild(that.eraseCoverImageBg);
             that.eraseCoverImage = null;
             that.eraseCoverImageBg = null;
-            if (configs.eraseCoverText) {
+            if (that.airIndexTip) {
                 that.maskedDom.removeChild(that.airIndexTip);
                 that.airIndexTip = null;
             }
@@ -359,15 +359,19 @@ define(['util', 'wave'], function(util, wave) {
         else  {
             this.logoImage = configs.logoImage;
         }
-        this._logoLeft = this.logoImage.offsetLeft;
-        this._logoTop = this.logoImage.offsetTop + 106; // hot fix
+        var offset = util.getOffset(this.logoImage);
+        this._logoLeft = offset[0];
+        this._logoTop = offset[1];
 
         var that = this;
-        if (this._configs.logoClickStart) {
-            this.logoImage.addEventListener(startEvent, function() {
+        this.logoImage.addEventListener(startEvent, function() {
+            if (that._configs.logoClickStart) {
                 that.start();
-            }, false);
-        }
+            }
+            if (that.onLogoClick) {
+                that.onLogoClick();
+            }
+        }, false);
     };
 
     /**
@@ -410,14 +414,11 @@ define(['util', 'wave'], function(util, wave) {
 
         // 处理logo图片 // customize
         if (this.logoImage) {
-            this._logoLeft = this.logoImage.offsetLeft;
-            this._logoTop = this.logoImage.offsetTop;
+            var offset = util.getOffset(this.logoImage);
+            this._logoLeft = offset[0];
+            this._logoTop = offset[1];
         }
 
-        if (this._configs.logoImage) {
-            this._logoLeft = this.logoImage.offsetLeft;
-            this._logoTop = this.logoImage.offsetTop;
-        }
         return this;
     };
 
@@ -509,6 +510,7 @@ define(['util', 'wave'], function(util, wave) {
             else {
                 toOpacity = (1 - easing(p)) * originOpacity;
                 that.maskCanvas.style.opacity = toOpacity;
+                that.setRainDropOpacity(toOpacity);
                 util.nextFrame(run);
             }
         }
@@ -979,6 +981,21 @@ define(['util', 'wave'], function(util, wave) {
     };
 
     /**
+     * 设置雨滴雨滴透明度
+     * @param {number} opacity 透明度值
+     * @return this
+     */
+    ErasableMask.prototype.setRainDropOpacity = function (opacity) {
+        if (!this.rainDrops || !this.maskedDom) {
+            return;
+        }
+        for (var i = 0, len = this.rainDrops.length; i < len; i++) {
+            this.rainDrops[i].style.opacity = opacity;
+        }
+        return this;
+    };
+
+    /**
      * 创建一个在浮在canvas上面的DOM元素
      * @param {string=|Element=} tag DOM标签或DOM对象 默认div
      * @param {number} x DOM元素放置的中心x点
@@ -1080,7 +1097,7 @@ define(['util', 'wave'], function(util, wave) {
             }
             else {
                 toAngle = toAngle >= 360 ? 0 : toAngle + 20;
-                cssStr = "left:" + (curX + (toX - curX) * easing(p) + 20) + 'px;' +
+                cssStr = "left:" + (curX + (toX - curX) * easing(p)) + 'px;' +
                          "top:" + (curY + (toY - curY) * easing(p)) + 'px;' +
                          "width:" + oriW * (1 - easing(p)) + 'px;' +
                          "height:" + oriH * (1 - easing(p)) + 'px';

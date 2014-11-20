@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-11-19 15:29]
+*     Last Modified       :     [2014-11-20 10:29]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -115,14 +115,22 @@ define(function() {
     /**
      * @type {Function}
      * @param {Element} dom 传入的DOM相关的内容
+     * @param {Element} relDom 相对于哪个元素计算，默认为body元素
      * @return {Array}
-     * 根据输入内容返回DOM元素，传入字符串就作为DOM的id，传入DOM元素相对body左上角的偏移量
+     * 根据输入内容返回DOM元素，传入字符串就作为DOM的id，传入DOM元素相对给定相对元素或body左上角的偏移量
      */
-    var getOffset = function (dom) {
-        if (isString(object)) {
-            return document.getElementById(object);
+    var getOffset = function (dom, relDom) {
+        var relDom = relDom || document.body;
+        var left = dom.offsetLeft;
+        var top = dom.offsetTop;
+        var offsetP = dom.offsetParent;
+
+        while (offsetP && offsetP != relDom && offsetP != document.body) {
+            left += offsetP.offsetLeft;
+            top += offsetP.offsetTop;
+            offsetP = offsetP.offsetParent;
         }
-        return object;
+        return [left, top];
     };
 
     /**
