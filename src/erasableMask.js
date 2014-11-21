@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-21 15:20]
+*     Last Modified       :     [2014-11-21 19:42]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -173,6 +173,17 @@ define(['util', 'wave'], function(util, wave) {
         if (configs.logoImage) {
             this.handleLogo();
         }
+        else if (configs.logoDom) {
+            this.logoImage = util.getElement(configs.logoDom);
+            var offset = util.getOffset(this.logoImage);
+            this._logoLeft = offset[0];
+            this._logoTop = offset[1];
+        }
+
+        // 处理关闭按钮 // customize
+        if (configs.closeImg) {
+            this.createCloseImage();
+        }
 
         this.setMaskSize(cb);
 
@@ -241,6 +252,22 @@ define(['util', 'wave'], function(util, wave) {
         if (angle && !configs.eraseCoverImage) {
             this.eraseImage.style[this.transformStr] = 'rotate(' + angle + 'deg)';
         }
+    };
+
+    /**
+     * 创建用于关闭图片
+     * @private
+     */
+    ErasableMask.prototype.createCloseImage = function () {
+        var configs = this._configs;
+        var that = this;
+
+        this.closeImage = this.createFloatImage(configs.closeImg, this.maskWidth - 20, 20, 27, 27);
+        this.closeImage.addEventListener('click', function() {
+            if (configs.onClose) {
+                configs.onClose();
+            }
+        }, false);
     };
 
     /**
@@ -340,7 +367,8 @@ define(['util', 'wave'], function(util, wave) {
                 this.logoImage = document.createElement('div');
             }
             var cssStr = 'background-image: url(' + configs.logoImage + ');background-repeat: no-repeat;';
-            cssStr += 'background-size: 100% 100%;';
+            cssStr += 'background-position: 4px 3px;';
+            cssStr += 'background-size: 41px 28px;';
             this.logoImage.style.cssText += cssStr;
             if (configs.logoLink) {
                 var logoImageStyle = getComputedStyle(this.logoImage);
@@ -413,7 +441,7 @@ define(['util', 'wave'], function(util, wave) {
         }
 
         // 处理logo图片 // customize
-        if (this.logoImage) {
+        if (this.logoImage || this.logoDom) {
             var offset = util.getOffset(this.logoImage);
             this._logoLeft = offset[0];
             this._logoTop = offset[1];
@@ -495,6 +523,10 @@ define(['util', 'wave'], function(util, wave) {
             if (that.airIndexTip) {
                 that.maskedDom.removeChild(that.airIndexTip);
                 that.airIndexTip = null;
+            }
+            if (that.closeImage) {
+                that.maskedDom.removeChild(that.closeImage);
+                that.closeImage = null;
             }
             cb();
         }

@@ -2,7 +2,7 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-11-21 16:18]
+*     Last Modified       :     [2014-11-21 19:37]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
@@ -49,6 +49,30 @@ define(['erasableMask'], function(Mask) {
         }
     }
 
+    // localStorage设置广告可以重新开启时间
+    function setStore(day) {
+        if (localStorage) {
+            var toDate = new Date();
+            toDate.setDate(toDate.getDate() + day);
+            toDate.setHours(0);
+            toDate.setMinutes(0);
+            toDate.setSeconds(0);
+            localStorage.setItem('search_pm25_close', toDate.getTime());
+        }
+    }
+
+    // 通过localStorage判断是否需要打开广告
+    function openAd() {
+        if (localStorage) {
+            var nowDate = new Date().getTime();
+            var storDate = localStorage.getItem('search_pm25_close') * 1;
+            if (storDate && nowDate < storDate) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     // 根据质量指数设置雾霾透明度
     function getOpacity(idx) {
@@ -59,6 +83,24 @@ define(['erasableMask'], function(Mask) {
             return 100;
         }
         return 100 - (350 - idx) * (30 / 300);
+    }
+
+
+    function genLogo(dom, src, linkHref) {
+        var logoImage = document.getElementById(dom);
+        var cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
+        cssStr += 'background-position: 4px 3px;';
+        cssStr += 'background-size: 41px 28px;';
+        logoImage.style.cssText += cssStr;
+
+        var logoImageStyle = getComputedStyle(logoImage);
+        if ('absolute' !== logoImageStyle.position && 'relative' !== logoImageStyle.position) {
+            logoImage.style.position = 'relative';
+        }
+        var link = document.createElement('a');
+        link.href = linkHref;
+        link.style.cssText = 'position:absolute;width:100%;height:100%;'
+        logoImage.appendChild(link);
     }
 
 
@@ -76,6 +118,7 @@ define(['erasableMask'], function(Mask) {
     var logoImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png';
     // 水滴图片
     var waterImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/waterdrop.png';
+    var closeImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/icon_delate.png';
     var airIndex = 130;
     var airIndexText = '轻度污染';
 
@@ -109,10 +152,19 @@ define(['erasableMask'], function(Mask) {
 
     var generated = false;
     function generateMask (airIdx, airText, logoDom) {
+        var logoImage = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png'; // logo图片
+        var logoLink = 'http://ap.larocheposay.com.cn/mobile/index.html?utm_source=Baidu&utm_medium=alading&utm_term=&utm_content=&utm_campaign=lrp-ap-20141021';
+        genLogo(logoDom, logoImage, logoLink);
         if (generated) {
             return;
         }
+
+        if (!openAd()) {
+            return;
+        }
+
         generated = true;
+        setStore(1);
 
         bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=19ce4a28eb2d6bb027ef967003030c85&et=0');
         bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=787912153e7e1e2592c9a2fa38943242&et=0');
@@ -144,18 +196,24 @@ define(['erasableMask'], function(Mask) {
             eraseCoverText: airIdx, // 空气指数
             eraseCoverTextDesc: airText, // 空气指数对应的文字
             logoDom: logoDom,
-            logoImage: 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png', // logo图片
-            logoLink: 'http://ap.larocheposay.com.cn/mobile/index.html?utm_source=Baidu&utm_medium=alading&utm_term=&utm_content=&utm_campaign=lrp-ap-20141021',
+            //logoImage: 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png', // logo图片
+            //logoLink: 'http://ap.larocheposay.com.cn/mobile/index.html?utm_source=Baidu&utm_medium=alading&utm_term=&utm_content=&utm_campaign=lrp-ap-20141021',
             logoClickStart: false, // 是否点击logo重新生成遮罩
             onLogoClick: function() {
                 bd_jingsuan('http://click.hm.baidu.com/clk?572bf2137c2a77365bc2e58749f6d2d3');
             },
             maskImage: maskImage, // 遮罩图片
+            closeImg: closeImg,
             onStart: function(x, y) { // 开始擦除，参数是开始擦除的部分相对遮罩的位置
                 genRain(x - 10, y + 30, 14, 14, 4000, 400, 200);
                 genRain(x - 35, y + 20, 10, 10, 4000, 500, 1000);
                 bd_tongji('wise-pm2.5-20141119', 'mobile', 'start');
                 bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=9c66cd2cebcde14bb150850a6a625756&et=0');
+            },
+            onClose: function() {
+                mask.clearMask(0, stopRain);
+                mask.rotateEraseImage(0, stopRain);
+                setStore(7);
             },
             callback: function(percent, x, y) { // 擦除中的回调，参数为擦除百分比和擦除当前位置相对遮罩的位置
                 if (percent >= 5) {
