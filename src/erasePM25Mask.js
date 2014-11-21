@@ -2,7 +2,7 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-11-20 14:41]
+*     Last Modified       :     [2014-11-21 16:18]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
@@ -34,7 +34,7 @@ define(['erasableMask'], function(Mask) {
     var tongjiHash = [];
     var hashLen;
     function bd_tongji(cat, action, label) {
-        if (_hmt) {
+        if (window['_hmt']) {
             _hmt.push(['_trackEvent', cat, action, label]);
             hashLen = tongjiHash.length;
             if (hashLen > 0) {
@@ -119,9 +119,6 @@ define(['erasableMask'], function(Mask) {
         setTimeout(function() { // 等待统计代码加载完
             bd_tongji('wise-pm2.5-20141119', 'mobile', 'open');
         }, 200);
-        if (airText != '优' && airText != '良') {
-            airText += '污染';
-        }
 
         window.addEventListener('resize', function() {
             if (!mask.maskCanvas) {
@@ -154,13 +151,11 @@ define(['erasableMask'], function(Mask) {
                 bd_jingsuan('http://click.hm.baidu.com/clk?572bf2137c2a77365bc2e58749f6d2d3');
             },
             maskImage: maskImage, // 遮罩图片
-            // color: '#ddd', // 纯色遮罩 用图片时不需要该配置
-            // showPoint: true,
             onStart: function(x, y) { // 开始擦除，参数是开始擦除的部分相对遮罩的位置
-                bd_tongji('wise-pm2.5-20141119', 'mobile', 'start');
-                bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=9c66cd2cebcde14bb150850a6a625756&et=0');
                 genRain(x - 10, y + 30, 14, 14, 4000, 400, 200);
                 genRain(x - 35, y + 20, 10, 10, 4000, 500, 1000);
+                bd_tongji('wise-pm2.5-20141119', 'mobile', 'start');
+                bd_jingsuan('http://click.hm.baidu.com/mkt.gif?ai=9c66cd2cebcde14bb150850a6a625756&et=0');
             },
             callback: function(percent, x, y) { // 擦除中的回调，参数为擦除百分比和擦除当前位置相对遮罩的位置
                 if (percent >= 5) {
@@ -175,15 +170,10 @@ define(['erasableMask'], function(Mask) {
                 if (percent >= 40) {
                     mask.clearMask(2000, stopRain);
                     mask.rotateEraseImage(2000, stopRain);
-                    // perDom.innerHTML = '已清除全部遮罩';
                 }
             }
         });
-
-        // 等页面渲染ok
-        setTimeout(function() {
-            mask.start();
-        }, 100)
+        mask.start();
     }
 
 
