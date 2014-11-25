@@ -1,0 +1,31 @@
+<!--******************************************************************************
+*     File Name           :     pm2.5.html
+*     Created By          :     DestinyXie
+*     Creation Date       :     [2014-10-21 15:50]
+*     Last Modified       :     [2014-11-25 11:01]
+*     Description         :     os test
+*******************************************************************************-->
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Erasable Mask</title>
+    <!--<script type="text/javascript" src="../src/require.js"></script>-->
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://s1.bdstatic.com/r/www/cache/ecom/esl/1-8-6/esl.min.js"></script>
+</head>
+<body>
+<script>
+require.config({
+    baseUrl: '../src'
+});
+require(['env'], function(Env) {
+    var os = Env.os;
+    var osInfo = JSON.stringify(os, null, 4);
+    $('body').html('<div>'+ osInfo +'</div>');
+});
+</script>
+</body>
+</html>

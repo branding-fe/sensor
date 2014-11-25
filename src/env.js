@@ -10,7 +10,7 @@ define(function() {
         var os = this.os = {};
         var browser = this.browser = {};
         var webkit = ua.match(/Web[kK]it[\/]{0,1}([\d.]+)/);
-        var android = ua.match(/(Android);?[\s\/]+([\d.]+)?/);
+        var android = ua.match(/(Android|Adr);?[\s\/]+([\d.]+)?/); // Adr android 2.3 UC浏览器中是用的Adr这个名字
         var ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
         var ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
         var iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
