@@ -2,11 +2,11 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-24 19:04]
+*     Last Modified       :     [2014-11-27 17:40]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
-define(['util', 'wave'], function(util, wave) {
+define(['sensor/util', 'sensor/wave'], function(util, wave) {
     /**
      * 给元素添加可擦除的遮罩。
      * @module ErasableMask
@@ -185,6 +185,10 @@ define(['util', 'wave'], function(util, wave) {
             this.createCloseImage();
         }
 
+        if (configs.backgroundImage) {
+            this.createBackgroundImage();
+        }
+
         this.setMaskSize(cb);
 
     };
@@ -268,6 +272,25 @@ define(['util', 'wave'], function(util, wave) {
                 configs.onClose();
             }
         }, false);
+    };
+
+    /**
+     * 创建背景底图
+     * @private
+     */
+    ErasableMask.prototype.createBackgroundImage = function () {
+        var configs = this._configs;
+        var width = this.maskWidth;
+        var height = this.calculHeight;
+        var that = this;
+
+        this.backgroundImage = this.createFloatDom('div', width / 2, height - configs.backgroundImageHeight / 2, width, configs.backgroundImageHeight / configs.backgroundImageWidth * width, function(dom) {
+            if (util.isString(configs.backgroundImage)) {
+                var cssStr = 'background-image: url(' + configs.backgroundImage + ');background-repeat: no-repeat;';
+                cssStr += 'background-size: 100% 100%;';
+                dom.style.cssText += cssStr;
+            }
+        }, 1);
     };
 
     /**
@@ -368,7 +391,7 @@ define(['util', 'wave'], function(util, wave) {
             }
             var cssStr = 'background-image: url(' + configs.logoImage + ');background-repeat: no-repeat;';
             cssStr += 'background-position: 4px 3px;';
-            cssStr += 'background-size: 41px 28px;';
+            cssStr += 'background-size: ' + configs.logoWidth + 'px ' + configs.logoHeight + 'px;';
             this.logoImage.style.cssText += cssStr;
             if (configs.logoLink) {
                 var logoImageStyle = getComputedStyle(this.logoImage);
@@ -445,6 +468,14 @@ define(['util', 'wave'], function(util, wave) {
             var offset = util.getOffset(this.logoImage);
             this._logoLeft = offset[0];
             this._logoTop = offset[1];
+        }
+
+        // 处理背景地图
+        if (this.backgroundImage) {
+            this.backgroundImage.style.left = width / 2;
+            this.backgroundImage.style.top = height - configs.backgroundImageHeight / 2;
+            this.backgroundImage.style.width = width + 'px';
+            this.backgroundImage.style.height = configs.backgroundImageHeight / configs.backgroundImageWidth * width + 'px';
         }
 
         return this;
@@ -527,6 +558,11 @@ define(['util', 'wave'], function(util, wave) {
             if (that.closeImage) {
                 that.maskedDom.removeChild(that.closeImage);
                 that.closeImage = null;
+            }
+            // 处理背景地图
+            if (that.backgroundImage) {
+                that.maskedDom.removeChild(that.backgroundImage);
+                that.backgroundImage = null;
             }
             cb();
         }
@@ -1052,7 +1088,7 @@ define(['util', 'wave'], function(util, wave) {
         }
 
         var cssStr = 'position: absolute;';
-        cssStr += 'z-index: ' + (zIndex | 3) + ';';
+        cssStr += 'z-index: ' + (zIndex || 3) + ';';
         cssStr += 'left: ' + (x - w / 2) + 'px;';
         cssStr += 'top: ' + (y - h / 2) + 'px;';
         cssStr += 'width: ' + w + 'px;';

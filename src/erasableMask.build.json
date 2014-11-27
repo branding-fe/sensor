@@ -1,7 +1,8 @@
 {
+    "baseUrl": "../",
     "paths": {
-            },
-
-    "modules": [{"name": "erasableMask"}]
+        "sensor": "../src"
+    },
+    "modules": [{"name": "erasableMask"}, {"name": "erasePM25Mask"}]
 }
 

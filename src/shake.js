@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-10-28 17:30]
+*     Last Modified       :     [2014-11-27 10:56]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
