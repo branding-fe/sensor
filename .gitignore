@@ -2,3 +2,5 @@ out/
 test/
 build/
 node_modules/
+.gitignore
+up.sh

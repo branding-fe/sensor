@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-11-27 17:40]
+*     Last Modified       :     [2014-12-04 14:56]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -93,14 +93,12 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                     mDom.offsetWidth - mDom.clientLeft - window.parseInt(getComputedStyle(mDom).borderRightWidth);
         var height = configs.height ? configs.height :
                      mDom.offsetHeight - mDom.clientTop - window.parseInt(getComputedStyle(mDom).borderBottomWidth);
+        this.maskWidth = width - configs.left;
+        this.maskHeight = height - configs.top;
         if (this.maskedDom === document.body) {
-            this.maskWidth = width;
-            this.maskHeight = height;
             this.calculHeight = viewHeight;
         }
         else {
-            this.maskWidth = width;
-            this.maskHeight = height;
             this.calculHeight = height;
         }
         this.transformStr = util.setCssPrefix('transform');
@@ -114,7 +112,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         this.maskCanvas = document.createElement('canvas');
         var cssStr = 'background-color: transparent;';
         cssStr += 'position: absolute;';
-        cssStr += 'z-index: 2;';
+        cssStr += 'z-index: 3;';
         cssStr += 'left: ' + this._configs.left + 'px;';
         cssStr += 'top: ' + this._configs.top + 'px;';
         this.maskCanvas.style.cssText += cssStr;
@@ -266,7 +264,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         var configs = this._configs;
         var that = this;
 
-        this.closeImage = this.createFloatImage(configs.closeImg, this.maskWidth - 20, 20, 27, 27);
+        var toY = this._logoTop + this.logoImage.offsetHeight / 2 - 5;
+        this.closeImage = this.createFloatImage(configs.closeImg, this.maskWidth - 29, toY, 27, 27);
         this.closeImage.addEventListener('click', function() {
             if (configs.onClose) {
                 configs.onClose();
@@ -290,7 +289,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 cssStr += 'background-size: 100% 100%;';
                 dom.style.cssText += cssStr;
             }
-        }, 1);
+        }, 2);
     };
 
     /**
@@ -305,7 +304,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         var height = this.calculHeight;
         this.eraseCoverImage = this.createFloatImage(configs.eraseCoverImage, width / 2 , height / 2,
                                    configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
-        this.eraseCoverImage.style.zIndex = 4;
+        this.eraseCoverImage.style.zIndex = 5;
 
         var that = this;
         this.eraseCoverImage.addEventListener(startEvent, function(e) {
@@ -331,7 +330,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             var cssStr = 'z-index: 3;background-color: #20b9e4; opacity: 0.4;border-radius:50px;';
             dom.style.cssText += cssStr;
         });
-        this.eraseCoverImage.style.zIndex = 4;
+        this.eraseCoverImage.style.zIndex = 5;
     };
 
 
@@ -376,7 +375,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         document.head.appendChild(sensorAddStyle);
     };
     /**
-     * 处理logo customize
+     * 处理logo customize TOBE DELETE
      * @private
      */
     ErasableMask.prototype.handleLogo = function () {
@@ -676,12 +675,12 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 ctx.fillStyle = '#000';
                 // this.eraseRect(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle);
                 // 使用椭圆，擦除时边缘更平滑
-                this.eraseOval(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle, this._configs.alphaRadius);
+                this.eraseOval(ctx, x - this._configs.left, y - this._configs.top, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle, this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
             }
             // 圆
             else if (eraseRadius) {
-                this.eraseCircle(ctx, x, y, eraseRadius, this._configs.alphaRadius);
+                this.eraseCircle(ctx, x - this._configs.left, y - this._configs.top, eraseRadius, this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
             }
 
@@ -807,7 +806,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         }
         e.preventDefault();
         this._startedErase = false;
-        this._firedOnStart = false;
         var erasePercent = this.getErasePercent();
         if (this._configs.callback) {
             this._configs.callback(erasePercent * 100, this._prevX, this._prevY);
@@ -820,8 +818,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      */
     ErasableMask.prototype.generateCheckPoints = function () {
         this.checkPoints = [];
-        var canvasW = this.maskCanvas.width;
-        var canvasH = this.calculHeight;
+        var canvasW = this.maskCanvas.width - this._configs.left;
+        var canvasH = this.calculHeight - this._configs.top;
         var step = this._configs.checkDistance;
         var xPoints = Math.ceil(canvasW / step);
         var yPoints = Math.ceil(canvasH / step);
@@ -1001,6 +999,10 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         if (!this.maskCanvas) {
             return;
         }
+        var configs = this._configs;
+
+        x -= configs.left || 0;
+        y -= configs.top || 0;
         var that = this;
         var ctx = this.maskCanvas.getContext('2d');
         var startTime = Date.now();
@@ -1023,7 +1025,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             else {
                 toY = easing(p) * distance;
                 that.eraseRect(ctx, x, y + easing(p) * distance / 2, w, toY);
-                rainImage.style.top = (y + toY - 3) + 'px';
+                rainImage.style.top = (y + configs.top + toY - 3) + 'px';
                 util.nextFrame(run);
             }
         }
@@ -1088,7 +1090,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         }
 
         var cssStr = 'position: absolute;';
-        cssStr += 'z-index: ' + (zIndex || 3) + ';';
+        cssStr += 'z-index: ' + (zIndex || 4) + ';';
         cssStr += 'left: ' + (x - w / 2) + 'px;';
         cssStr += 'top: ' + (y - h / 2) + 'px;';
         cssStr += 'width: ' + w + 'px;';
