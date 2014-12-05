@@ -2,7 +2,7 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-12-04 14:44]
+*     Last Modified       :     [2014-12-05 20:35]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
@@ -96,6 +96,11 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
                 return false;
             }
         }
+
+        if (Env.browser.firefox) {
+            return false;
+        }
+
         return true;
     }
 
@@ -125,7 +130,8 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         }
         var link = document.createElement('a');
         link.href = linkHref;
-        link.style.cssText = 'position:absolute;width:100%;height:100%;'
+        link.target = '_blank';
+        link.style.cssText = 'position:absolute;width:100%;height:100%;';
         logoImage.appendChild(link);
 
 
@@ -212,7 +218,7 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         radius: 100,
 
         // 擦除宽度 擦除图片为长方形时配置
-        eraseWidth: 51,
+        eraseWidth: 52,
 
         // 擦除高度 擦除图片为长方形时配置
         eraseHeight: 122,
@@ -257,10 +263,14 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         not_show_with_close: 7
     };
 
+    if (location.href.indexOf('tn=zbios') > -1) {
+        configs.top = 0;
+    }
+
     var generated = false;
     function generateMask (airIdx, airText, logoDom, maskedDom) {
         configs.airIndex = airIdx || configs.airIndex;
-        configs.airIndexText = airIdx || configs.airIndexText;
+        configs.airIndexText = airText || configs.airIndexText;
         configs.logoDom = logoDom || configs.logoDom;
         configs.maskedDom = maskedDom;
 
@@ -281,6 +291,10 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         var maskTop = configs.top || 0;
         // 瓶子图片
         var bottleImg = configs.eraseImage;
+        // 瓶子高度
+        var bottleHeight = configs.eraseHeight;
+        // 瓶子宽度
+        var bottleWidth = configs.eraseWidth;
         // 瓶子遮盖提示图片
         var coverImg = configs.coverImg;
         // 背景底图
@@ -288,7 +302,7 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         // 背景底图宽度
         var backgroundImageWidth = configs.backgroundImageWidth || 320;
         // 背景底图高度
-        var backgroundImageHeight = configs.backgroundImageHeight || 120;
+        var backgroundImageHeight = configs.backgroundImageHeight || 152;
 
         genLogo(logoDom, logoImage, logoLink, configs);
         bd_jingsuan(configs.log_logo_show);
@@ -315,6 +329,12 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
             mask.refreshMaskSize();
         }, false);
 
+        // 大搜单页模式时，hash改变时消除遮罩
+        window.addEventListener('hashchange', function() {
+            mask.clearMask(0, stopRain);
+            mask.rotateEraseImage(0, stopRain);
+        }, false);
+
         // 第一个参数为被遮罩的DOM元素或DOM元素id
         mask = new Mask(configs.maskedDom || document.body, {
             alpha: getOpacity(airIdx), // 雾霾透明度
@@ -324,8 +344,8 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
             eraseHeight: 140, // 擦除高度
             angle: imgAngle, // 擦除区块逆时针偏转角度
             eraseImage: bottleImg, // 用于擦除的瓶子图片
-            eraseImageWidth: 49, // 瓶子宽度
-            eraseImageHeight: 134, // 瓶子高度
+            eraseImageWidth: bottleWidth, // 瓶子宽度
+            eraseImageHeight: bottleHeight, // 瓶子高度
             eraseCoverImage: coverImg, // 瓶子遮盖提示图片
             eraseCoverImageWidth: 142, // 瓶子遮盖图片宽度
             eraseCoverImageHeight: 196, // 瓶子遮盖图片高度

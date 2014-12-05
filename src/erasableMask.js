@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-12-04 14:56]
+*     Last Modified       :     [2014-12-05 16:48]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -187,7 +187,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             this.createBackgroundImage();
         }
 
-        this.setMaskSize(cb);
+        cb && cb();
+        this.setMaskSize();
 
     };
 
@@ -195,7 +196,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * 设置遮罩的尺寸
      * @private
      */
-    ErasableMask.prototype.setMaskSize = function (cb) {
+    ErasableMask.prototype.setMaskSize = function () {
         var that = this;
         var mDom = this.maskedDom;
         var configs = this._configs;
@@ -227,8 +228,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 catch (e) {
                     that.isTainted = true;
                 }
-
-                cb && cb(ctx);
             }, false);
         }
         else {
@@ -236,8 +235,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             ctx.fillRect(0, 0, this.maskWidth, this.maskHeight);
             this.generateCheckPoints();
             ctx.globalCompositeOperation = 'destination-out';
-
-            cb && cb(ctx);
         }
     };
 
@@ -469,6 +466,14 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             this._logoTop = offset[1];
         }
 
+        // 处理关闭按钮 // customize
+        if (this.closeImage) {
+            var toX = this.maskWidth - 42.5;
+            var toY = this._logoTop + this.logoImage.offsetHeight / 2 - 18.5;
+            this.closeImage.style.left = toX + 'px';
+            this.closeImage.style.top = toY + 'px';
+        }
+
         // 处理背景地图
         if (this.backgroundImage) {
             this.backgroundImage.style.left = width / 2;
@@ -494,15 +499,21 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             that.generateMask();
         }
 
+        this.maskCanvas.addEventListener(startEvent, function(e) {
+            e.preventDefault();
+        }, false);
+        this.maskCanvas.addEventListener(moveEvent, function(e) {
+            e.preventDefault();
+        }, false);
+        this.maskCanvas.addEventListener(startEvent, this, false);
+        this.maskCanvas.addEventListener(moveEvent, this, false);
+        this.maskCanvas.addEventListener(endEvent, this, false);
+        this.maskCanvas.addEventListener(leaveEvent, this, false);
+
         function registerEvent(ctx) {
             if (that._configs.showPoint) {
                 that.getErasePercent(true);
             }
-
-            that.maskCanvas.addEventListener(startEvent, that, false);
-            that.maskCanvas.addEventListener(moveEvent, that, false);
-            that.maskCanvas.addEventListener(endEvent, that, false);
-            that.maskCanvas.addEventListener(leaveEvent, that, false);
 
             if (that.eraseImage) {
                 that.eraseImage.addEventListener(startEvent, that, false);
@@ -511,6 +522,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             }
         }
         that.configMask(registerEvent);
+
         return this;
     };
 
