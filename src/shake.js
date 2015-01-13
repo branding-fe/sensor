@@ -2,12 +2,12 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2014-11-27 10:56]
+*     Last Modified       :     [2015-01-13 17:35]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
 
-define(['util'], function(util) {
+define(['sensor/util'], function(util) {
     /**
      * Shake会监听移动设备的摇晃动作，会返回触发事件时各个方向的加速度值(考虑重力加速度)。
      * @module Shake

@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2014-12-05 16:48]
+*     Last Modified       :     [2015-01-13 16:55]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -187,16 +187,14 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             this.createBackgroundImage();
         }
 
-        cb && cb();
-        this.setMaskSize();
-
+        this.setMaskSize(cb);
     };
 
     /**
      * 设置遮罩的尺寸
      * @private
      */
-    ErasableMask.prototype.setMaskSize = function () {
+    ErasableMask.prototype.setMaskSize = function (cb) {
         var that = this;
         var mDom = this.maskedDom;
         var configs = this._configs;
@@ -228,6 +226,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 catch (e) {
                     that.isTainted = true;
                 }
+                cb && cb();
             }, false);
         }
         else {
@@ -235,6 +234,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             ctx.fillRect(0, 0, this.maskWidth, this.maskHeight);
             this.generateCheckPoints();
             ctx.globalCompositeOperation = 'destination-out';
+            cb && cb();
         }
     };
 
@@ -575,7 +575,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 that.maskedDom.removeChild(that.backgroundImage);
                 that.backgroundImage = null;
             }
-            cb();
+            cb && cb();
         }
         function run() {
             if (!that.maskCanvas) {
@@ -599,7 +599,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         }
         else {
             doClear();
-            cb();
         }
 
         return this;

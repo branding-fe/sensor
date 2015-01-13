@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-05 14:27]
+*     Last Modified       :     [2015-01-13 16:39]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -46,7 +46,10 @@
 </div>
 <script>
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../src',
+    paths: {
+        sensor: '../src'
+    }
 });
 require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
