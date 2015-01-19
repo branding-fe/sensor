@@ -3,6 +3,6 @@
     "paths": {
         "sensor": "../src"
     },
-    "modules": [{"name": "erasableMask"}, {"name": "erasePM25Mask"}]
+    "modules": [{"name": "erasableMask"}, {"name": "orientation"}]
 }
 

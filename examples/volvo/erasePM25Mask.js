@@ -2,7 +2,7 @@
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2014-12-05 20:35]
+*     Last Modified       :     [2015-01-16 21:57]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 

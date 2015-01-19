@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2015-01-13 17:35]
+*     Last Modified       :     [2015-01-19 12:45]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -53,7 +53,7 @@ define(['sensor/util'], function(util) {
         else {
             util.extend(this._configs, opt_options || {}, true);
         }
-    }
+    };
 
     /**
      * 设置响应加速度改变的回调函数

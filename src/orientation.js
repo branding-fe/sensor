@@ -2,7 +2,7 @@
 *     File Name           :     src/orientation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 16:43]
-*     Last Modified       :     [2015-01-13 17:36]
+*     Last Modified       :     [2015-01-19 12:45]
 *     Description         :     监测移动设备倾斜角度
 ********************************************************************************/
 
@@ -60,7 +60,7 @@ define(['sensor/util'], function(util) {
         else {
             util.extend(this._configs, opt_options || {}, true);
         }
-    }
+    };
 
     /**
      * 设置响应倾斜的回调函数

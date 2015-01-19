@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2015-01-13 16:55]
+*     Last Modified       :     [2015-01-19 11:39]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -146,8 +146,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * @private
      */
     ErasableMask.prototype.configMask = function(cb) {
-        var that = this;
-        var mDom = this.maskedDom;
         var configs = this._configs;
 
         this.detectViewport();
@@ -163,7 +161,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
 
         // 创建指数tip文本
         if (configs.eraseCoverText) {
-            this.airIndexTip = this.buildAirIndexTip(this.maskWidth / 2 , this.calculHeight / 2, configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
+            this.airIndexTip = this.buildAirIndexTip(this.maskWidth / 2 , this.calculHeight / 2,
+                    configs.eraseCoverImageWidth, configs.eraseCoverImageHeight);
             this.buildAirIndexText(configs.eraseCoverText, configs.eraseCoverTextDesc);
         }
 
@@ -259,7 +258,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      */
     ErasableMask.prototype.createCloseImage = function () {
         var configs = this._configs;
-        var that = this;
 
         var toY = this._logoTop + this.logoImage.offsetHeight / 2 - 5;
         this.closeImage = this.createFloatImage(configs.closeImg, this.maskWidth - 29, toY, 27, 27);
@@ -278,15 +276,17 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         var configs = this._configs;
         var width = this.maskWidth;
         var height = this.calculHeight;
-        var that = this;
 
-        this.backgroundImage = this.createFloatDom('div', width / 2, height - configs.backgroundImageHeight / 2, width, configs.backgroundImageHeight / configs.backgroundImageWidth * width, function(dom) {
-            if (util.isString(configs.backgroundImage)) {
-                var cssStr = 'background-image: url(' + configs.backgroundImage + ');background-repeat: no-repeat;';
-                cssStr += 'background-size: 100% 100%;';
-                dom.style.cssText += cssStr;
-            }
-        }, 2);
+        this.backgroundImage = this.createFloatDom('div', width / 2, height - configs.backgroundImageHeight / 2,
+                width, configs.backgroundImageHeight / configs.backgroundImageWidth * width,
+            function(dom) {
+                if (util.isString(configs.backgroundImage)) {
+                    var cssStr = 'background-image: url(' + configs.backgroundImage + ');background-repeat: no-repeat;';
+                    cssStr += 'background-size: 100% 100%;';
+                    dom.style.cssText += cssStr;
+                }
+            },
+        2);
     };
 
     /**
@@ -321,8 +321,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         this.eraseCoverImage.addEventListener(endEvent, this, false);
 
         // 发光波纹
-        this.eraseCoverImageBg = this.createFloatDom('div', width / 2 , height / 2,
-                                   80, 80, function (dom) {
+        this.eraseCoverImageBg = this.createFloatDom('div', width / 2 , height / 2, 80, 80, function (dom) {
             that.createAnim(dom, width / 2, height / 2);
             var cssStr = 'z-index: 3;background-color: #20b9e4; opacity: 0.4;border-radius:50px;';
             dom.style.cssText += cssStr;
@@ -366,8 +365,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 '95%{' + mState + '}' +
                 '100%{' + sState + '}}';
         var cssStr = '-webkit-animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
-            cssStr += '-moz-animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
-            cssStr += 'animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
+        cssStr += '-moz-animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
+        cssStr += 'animation:sensorCoverBigger' + this.preStyleIdx + ' 2s 1s forwards linear infinite;';
         dom.style.cssText += cssStr;
         document.head.appendChild(sensorAddStyle);
     };
@@ -396,14 +395,14 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 }
                 var link = document.createElement('a');
                 link.href = configs.logoLink;
-                link.style.cssText = 'position:absolute;width:100%;height:100%;'
+                link.style.cssText = 'position:absolute;width:100%;height:100%;';
                 this.logoImage.appendChild(link);
             }
             if (!configs.logoDom) {
                 this.maskedDom.appendChild(this.logoImage);
             }
         }
-        else  {
+        else {
             this.logoImage = configs.logoImage;
         }
         var offset = util.getOffset(this.logoImage);
@@ -479,7 +478,8 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             this.backgroundImage.style.left = width / 2;
             this.backgroundImage.style.top = height - configs.backgroundImageHeight / 2;
             this.backgroundImage.style.width = width + 'px';
-            this.backgroundImage.style.height = configs.backgroundImageHeight / configs.backgroundImageWidth * width + 'px';
+            this.backgroundImage.style.height = configs.backgroundImageHeight / configs.backgroundImageWidth *
+                width + 'px';
         }
 
         return this;
@@ -686,12 +686,14 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 ctx.fillStyle = '#000';
                 // this.eraseRect(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle);
                 // 使用椭圆，擦除时边缘更平滑
-                this.eraseOval(ctx, x - this._configs.left, y - this._configs.top, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle, this._configs.alphaRadius);
+                this.eraseOval(ctx, x - this._configs.left, y - this._configs.top, this._configs.eraseWidth,
+                        this._configs.eraseHeight, -this._configs.angle, this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
             }
             // 圆
             else if (eraseRadius) {
-                this.eraseCircle(ctx, x - this._configs.left, y - this._configs.top, eraseRadius, this._configs.alphaRadius);
+                this.eraseCircle(ctx, x - this._configs.left, y - this._configs.top, eraseRadius,
+                        this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
             }
 
@@ -941,8 +943,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 }
             }
         }
-        //console.log(inTimes);
-        //console.log(caTimes);
 
         var transCount = 0;
         for (var k = 0; k < pointsLen; k++) {
@@ -961,11 +961,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * @return {Array} 坐标数组
      * @private
      */
-    ErasableMask.prototype.getNeedCheckArr = function (point) {
-        // var firstCheckPoint = this.checkPoints[0];
-        // var r = this._configs.radius;
-        // var minX = point[0] - r;
-    };
+    ErasableMask.prototype.getNeedCheckArr = function (point) {};
 
     /**
      * 计算两点之间的距离
@@ -1136,7 +1132,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         }
         img = this.createFloatDom(domTag, x, y, w, h, function(dom) {
             if (util.isString(src)) {
-                var cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
+                cssStr = 'background-image: url(' + src + ');background-repeat: no-repeat;';
                 cssStr += 'background-size: 100% 100%;';
                 dom.style.cssText += cssStr;
             }
@@ -1178,10 +1174,10 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             }
             else {
                 toAngle = toAngle >= 360 ? 0 : toAngle + 20;
-                cssStr = "left:" + (curX + (toX - curX) * easing(p)) + 'px;' +
-                         "top:" + (curY + (toY - curY) * easing(p)) + 'px;' +
-                         "width:" + oriW * (1 - easing(p)) + 'px;' +
-                         "height:" + oriH * (1 - easing(p)) + 'px';
+                cssStr = 'left:' + (curX + (toX - curX) * easing(p)) + 'px;' +
+                         'top:' + (curY + (toY - curY) * easing(p)) + 'px;' +
+                         'width:' + oriW * (1 - easing(p)) + 'px;' +
+                         'height:' + oriH * (1 - easing(p)) + 'px';
                 that.eraseImage.style.cssText += cssStr;
                 that.eraseImage.style[that.transformStr] = 'rotate(' + toAngle + 'deg)';
                 util.nextFrame(run);
@@ -1206,9 +1202,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * @return this
      */
     ErasableMask.prototype.buildAirIndexTip = function (x, y, w, h) {
-        var configs = this._configs;
-        var airIndex = configs.eraseCoverText;
-        var that = this;
         var tip = this.createFloatDom('div', x, y + h / 2 + 10, w, 50, function(dom) {
             var cssStr = 'font-size: 17px; color: #fff; text-align: center;';
             cssStr += 'text-shadow: 1px 1px 1px #040000;';
@@ -1227,11 +1220,13 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * @return this
      */
     ErasableMask.prototype.buildAirIndexText = function (value, desc) {
-        this.airIndexTip.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px; font-size: 17px;">空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 24px;">' + value +
-                    '<i style="display: inline-block; min-width: 50px; line-height: 16px;height: 16px; color: #fff; background-color: #0996d1;' +
-                    'text-shadow: none;-webkit-text-shadow: none;-moz-text-shadow: none;' +
-                    '-webkit-border-radius: 16px;-moz-border-radius: 16px;border-radius: 16px;margin-left:5px;font-style: normal;font-size: 13px;font-weight: normal;vertical-align: top;margin-top: 2px;padding: 0 5px;">' +
-                    desc + '</i></p>';
+        this.airIndexTip.innerHTML = '<h3 style="padding: 0; margin: 0; line-height: 20px; font-size: 17px;">' +
+            '空气质量指数</h3><p style="margin:0;padding:5px 0;font-size: 24px;">' + value +
+           '<i style="display: inline-block; min-width: 50px; line-height: 16px;height: 16px;' +
+           'color: #fff; background-color: #0996d1;text-shadow: none;-webkit-text-shadow: none;' +
+           '-moz-text-shadow: none;-webkit-border-radius: 16px;-moz-border-radius: 16px;' +
+           'border-radius: 16px;margin-left:5px;font-style: normal;font-size: 13px;font-weight: normal;' +
+           'vertical-align: top;margin-top: 2px;padding: 0 5px;">' + desc + '</i></p>';
         return this;
     };
 

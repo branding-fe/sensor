@@ -2,7 +2,7 @@
 *     File Name           :     pm2.5.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-11-21 18:19]
+*     Last Modified       :     [2015-01-15 19:56]
 *     Description         :     erase part of mask
 *******************************************************************************-->
 
@@ -99,17 +99,20 @@
 </div>
 <div id="imgWrap">
     <img id="logo" src="http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/pm_logo.png" />
-    <img class="originCont" src="../images/pm2.5/pm_bg_1.jpg" />
+    <img class="originCont" src="../../examples/pm2.5/pm_bg_1.jpg" />
     <div id="percentDom"></div>
 </div>
 <script>
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../../src',
+    paths: {
+        sensor: '../src'
+    }
     //paths: {
     //    'erasableMask': 'http://bs.baidu.com/public01/bcs-sensor/build/erasableMask'
     //}
 });
-require(['erasableMask'], function(Mask) {
+require(['sensor/erasableMask'], function(Mask) {
     var bgImg = $('.originCont');
     function getIdxText(idx) {
         if (idx >= 300) {
@@ -147,7 +150,7 @@ require(['erasableMask'], function(Mask) {
         curDom.addClass('selected');
         var idx = curDom.html();
         var text = getIdxText(idx);
-        bgImg.attr('src', '../images/pm2.5/pm_bg_' + curDom.attr('index') + '.jpg');
+        bgImg.attr('src', '../../examples/pm2.5/pm_bg_' + curDom.attr('index') + '.jpg');
         if (mask.airIndexTip) {
             mask.buildAirIndexText(idx, text);
             mask.setOpacity(getOpacity(idx));

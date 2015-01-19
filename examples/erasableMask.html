@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2015-01-13 16:39]
+*     Last Modified       :     [2015-01-15 19:50]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -40,7 +40,7 @@
 <body>
 <div id="outerWrap">
 <div id="imgWrap">
-    <img src="../images/pet.jpg" />
+    <img src="../../images/pet.jpg" />
     <div id="percentDom"></div>
 </div>
 </div>
@@ -51,7 +51,7 @@ require.config({
         sensor: '../src'
     }
 });
-require(['erasableMask'], function(Mask) {
+require(['sensor/erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
@@ -67,7 +67,7 @@ require(['erasableMask'], function(Mask) {
         eraseWidth: 20,
         eraseHeight: 100,
         angle: 45,
-        maskImage: '/images/pet2.jpg',
+        maskImage: '../images/pet2.jpg',
         showPoint: true,
         callback: function(percent, x, y) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';

@@ -2,7 +2,7 @@
 *     File Name           :     src/util.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-15 15:49]
-*     Last Modified       :     [2014-11-20 10:29]
+*     Last Modified       :     [2015-01-19 12:46]
 *     Description         :     工具类
 ********************************************************************************/
 
@@ -125,7 +125,7 @@ define(function() {
         var top = dom.offsetTop;
         var offsetP = dom.offsetParent;
 
-        while (offsetP && offsetP != relDom && offsetP != document.body) {
+        while (offsetP && offsetP !== relDom && offsetP !== document.body) {
             left += offsetP.offsetLeft;
             top += offsetP.offsetTop;
             offsetP = offsetP.offsetParent;

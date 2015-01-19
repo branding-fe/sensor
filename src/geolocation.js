@@ -2,7 +2,7 @@
 *     File Name           :     src/geolocation.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-10 17:49]
-*     Last Modified       :     [2015-01-13 17:35]
+*     Last Modified       :     [2015-01-19 11:20]
 *     Description         :     地理位置获取接口
 ********************************************************************************/
 
@@ -31,7 +31,7 @@ define(['sensor/util'], function(util) {
         else {
             util.extend(this._configs, opt_options || {}, true);
         }
-    }
+    };
 
     // 错误信息
     var errorMessage = {
