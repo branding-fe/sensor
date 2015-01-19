@@ -36,9 +36,12 @@
 </div>
 <script type="text/javascript" charset="utf-8">
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../src',
+    paths: {
+        sensor: '../src'
+    }
 });
-require(['geolocation', 'x'], function(Geo, X) {
+require(['sensor/geolocation', 'sensor/x'], function(Geo, X) {
     var geoDom = document.getElementById("geo");
     var vpW = document.documentElement.offsetWidth;
     var vpH = document.documentElement.offsetHeight;

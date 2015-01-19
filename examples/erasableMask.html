@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2014-10-27 15:53]
+*     Last Modified       :     [2015-01-15 19:50]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -40,15 +40,18 @@
 <body>
 <div id="outerWrap">
 <div id="imgWrap">
-    <img src="../images/pet.jpg" />
+    <img src="../../images/pet.jpg" />
     <div id="percentDom"></div>
 </div>
 </div>
 <script>
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../src',
+    paths: {
+        sensor: '../src'
+    }
 });
-require(['erasableMask'], function(Mask) {
+require(['sensor/erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
@@ -59,10 +62,14 @@ require(['erasableMask'], function(Mask) {
     var mask = new Mask('imgWrap', {
         width: 500,
         height: 332,
+        alpha: 90,
         alphaRadius: 5,
+        eraseWidth: 20,
+        eraseHeight: 100,
+        angle: 45,
         maskImage: '../images/pet2.jpg',
         showPoint: true,
-        callback: function(percent) {
+        callback: function(percent, x, y) {
             perStr = '擦除百分比为：' + Math.floor(percent) + '%';
             perDom.innerHTML = perStr;
             if (percent >= 40) {
@@ -73,7 +80,6 @@ require(['erasableMask'], function(Mask) {
         }
     });
     mask.start();
-
 })();
 </script>
 </body>

@@ -2,11 +2,11 @@
 *     File Name           :     src/x.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 10:04]
-*     Last Modified       :     [2014-10-21 13:49]
+*     Last Modified       :     [2014-11-27 10:56]
 *     Description         :     Ajax请求和JSONP请求方法
 ********************************************************************************/
 
-define(['./util'], function(util) {
+define(['sensor/util'], function(util) {
     /**
      * @constructor
      * @param {Object=|Function=} opt_options 配置项 参数为对象时是配置项；参数为函数时，做为配置项的callback值

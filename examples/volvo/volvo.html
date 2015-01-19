@@ -1,0 +1,178 @@
+<!--******************************************************************************
+*     File Name           :     examples/volvo.html
+*     Created By          :     DestinyXie
+*     Creation Date       :     [2014-11-27 16:41]
+*     Last Modified       :     [2015-01-15 20:28]
+*     Description         :     volvo car
+*******************************************************************************-->
+
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Erasable Mask</title>
+    <!--<script type="text/javascript" src="../src/require.js"></script>-->
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!--<script src="http://bs.baidu.com/public01/bcs-sensor/build/erasePM25Mask-built.js"></script>-->
+    <script src="../../build/eraseVOLVOMask-built.js"></script>
+    <style>
+    body {
+        padding: 0;
+        margin: 0;
+        height: 1000px;
+    }
+    #imgWrap {
+        width: 100%;
+        position: relative;
+    }
+    .originCont {
+        width: 100%;
+    }
+    #percentDom {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        color: #111;
+        font-size: 14px;
+        z-index: 100;
+    }
+    #logo {
+        position: absolute;
+        width: 44px;
+        height: 25px;
+        top: 147px;
+        right: 17px;
+    }
+    </style>
+</head>
+<body>
+<div id="imgWrap">
+    <div id="logo"></div>
+    <img class="originCont" src="../../examples/pm2.5/pm_bg_1.jpg" />
+    <div id="percentDom"></div>
+</div>
+<script>
+require(['erasePM25Mask'], function(genMask) {
+    // 根据质量指数生成相应的文字
+    function getIdxText(idx) {
+        if (idx >= 300) {
+            return '严重';
+        }
+        if (idx >= 200) {
+            return '重度';
+        }
+        if (idx >= 150) {
+            return '中度';
+        }
+        if (idx >= 100) {
+            return '轻度';
+        }
+        if (idx >= 50) {
+            return '良';
+        }
+        if (idx >= 0) {
+            return '优';
+        }
+        return '不知道';
+    }
+    var airIndex = 130;
+    var airIndexText = '轻度';
+
+    // TEST从url上获取空气质量指数
+    var hrefIndex = /\airIndex=(\d+)/.exec(location.href);
+    if (hrefIndex && hrefIndex.length > 1) {
+        airIndex = hrefIndex[1];
+    }
+
+    airIndexText = getIdxText(airIndex);
+
+    // 雾霾配置项
+    /**
+    var configs = {
+
+        // 雾霾指数
+        airIndex: airIndex,
+
+        // 雾霾指数对应的文字
+        airIndexText: airIndexText,
+
+        // logo放置的dom id
+        logoDom: 'logo',
+
+        // logo图片
+        logoImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/logo44x25.png',
+
+        // logo点击跳转链接地址
+        logoLink: 'http://www.volvocars.com/zh-CN/mobile/experience/Pages/S60L.aspx',
+
+        // logo图片宽度
+        logoWidth: 44,
+
+        // logo图片高度
+        logoHeight: 25,
+
+        // 雾霾图片  // 320 * 480 80K以内 png
+        maskImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/pm_fog_big.png',
+
+        // 擦除雾霾时的边缘模糊距离
+        alphaRadius: 10,
+
+        // 擦除半径
+        radius: 100,
+
+        // 擦除宽度 擦除图片为长方形时配置
+        eraseWidth: 50,
+
+        // 擦除高度 擦除图片为长方形时配置
+        eraseHeight: 140,
+
+        // 擦除区块逆时针偏转角度 擦除图片为长方形时配置
+        angle: 45,
+
+        // 用于擦除的图片
+        eraseImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/leaf.png',
+
+        // 遮盖提示图片
+        coverImg: '//bs.baidu.com/public01/bcs-sensor/images/volvo/pm_tip.png',
+
+        // 雾霾后面垫的图片 // 320 * 200 80K以内 png
+        backgroundImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/in_car2.png',
+
+        // 百度统计链接地址
+        log_src: '//hm.baidu.com/hm.js?b58153b89c1a676666560e865c526068',
+
+        // 百度统计统计名称
+        log_name: 'wise-pm2.5-volvo-20141128',
+
+        // 精算: 显示logo
+        log_logo_show: 'http://click.hm.baidu.com/mkt.gif?ai=818d83661f98417a5c4d2d837e6aa37d&et=0&r=' + new Date().getTime(),
+
+        // 精算: 点击logo
+        log_logo_click: 'http://click.hm.baidu.com/clk?610fb888e544770f8831c89756d39a94',
+
+        // 精算: 打开浮层
+        log_open: 'http://click.hm.baidu.com/mkt.gif?ai=758bbfbd65209c6b94ef39db5d4a2894&et=0',
+
+        // 精算: 用户交互
+        log_start: 'http://click.hm.baidu.com/mkt.gif?ai=172a598cb1c366983c554fe66333ed33&et=0',
+
+        // localStorage名称用户记录展示之后不再展示的截止时间
+        localStorageName: 'search_pm25_volvo_close',
+
+        // 未点关闭多少个自然天不显示
+        not_show_without_close: 1,
+
+        // 点关闭后多少个自然天不显示
+        not_show_with_close: 7
+    };
+    genMask(configs);
+    */
+
+    genMask(airIndex, airIndexText, 'logo');
+
+});
+</script>
+</body>
+</html>

@@ -24,7 +24,10 @@
 摇晃手机变色
 <script type="text/javascript" charset="utf-8">
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../src',
+    paths: {
+        sensor: '../src'
+    }
 });
 require(['shake'], function(Shake) {
     var colors = ['#ff0', '#f00', '#00f', '#0f0', '#0ff', '#f0f'];

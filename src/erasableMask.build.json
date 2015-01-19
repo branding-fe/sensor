@@ -1,0 +1,8 @@
+{
+    "baseUrl": "../",
+    "paths": {
+        "sensor": "../src"
+    },
+    "modules": [{"name": "erasableMask"}, {"name": "orientation"}]
+}
+

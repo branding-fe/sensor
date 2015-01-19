@@ -24,7 +24,10 @@
 <canvas id="ball">Your browser does not support the HTML5 canvas tag.</canvas>
 <script type="text/javascript" charset="utf-8">
 require.config({
-    baseUrl: '../src'
+    baseUrl: '../src',
+    paths: {
+        sensor: '../src'
+    }
 });
 require(['orientation'], function(Orientation) {
     var sense,
