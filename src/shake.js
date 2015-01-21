@@ -2,7 +2,7 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2015-01-19 12:45]
+*     Last Modified       :     [2015-01-21 17:43]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -81,7 +81,8 @@ define(['sensor/util'], function(util) {
         }
     };
 
-    /** 停止检测手机加速度
+    /**
+     * 停止检测手机加速度
      * @return this
      */
     Shake.prototype.stop = function () {

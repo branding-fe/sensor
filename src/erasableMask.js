@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2015-01-19 11:39]
+*     Last Modified       :     [2015-01-21 18:16]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -29,6 +29,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
      * @param {number=} opt_options.radius 擦除半径大小
      * @param {number=} opt_options.eraseWidth 擦除宽度
      * @param {number=} opt_options.eraseHeight 擦除高度
+     * @param {number=} opt_options.smooth 擦除形状为矩形时，是否用椭圆替换矩形，使擦除时边缘更平滑
      * @param {number=} opt_options.angle 旋转弧度，旋转角度，以弧度计。角度转换为弧度计算 degrees*Math.PI/180
      * @param {number=} opt_options.alphaRadius 擦除外边缘半透明渐变距离
      * @param {boolean=} opt_options.showPoint 显示计算点，默认false
@@ -53,6 +54,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             'checkDistance': 20,
             'radius': 20,
             'alphaRadius': 10,
+            'smooth': true,
             'showPoint': false
         };
 
@@ -370,6 +372,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         dom.style.cssText += cssStr;
         document.head.appendChild(sensorAddStyle);
     };
+
     /**
      * 处理logo customize TOBE DELETE
      * @private
@@ -604,7 +607,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
         return this;
     };
 
-
     /**
      * 停止响应擦除的动作
      * @return this
@@ -684,10 +686,15 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             // 方
             if (this._configs.eraseWidth) {
                 ctx.fillStyle = '#000';
-                // this.eraseRect(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight, -this._configs.angle);
-                // 使用椭圆，擦除时边缘更平滑
-                this.eraseOval(ctx, x - this._configs.left, y - this._configs.top, this._configs.eraseWidth,
+                if (this._configs.smooth) {
+                    // 使用椭圆，擦除时边缘更平滑
+                    this.eraseOval(ctx, x - this._configs.left, y - this._configs.top, this._configs.eraseWidth,
                         this._configs.eraseHeight, -this._configs.angle, this._configs.alphaRadius);
+                }
+                else {
+                    this.eraseRect(ctx, x, y, this._configs.eraseWidth, this._configs.eraseHeight,
+                        this._configs.angle);
+                }
                 ctx.fillStyle = '#000';
             }
             // 圆
@@ -953,7 +960,6 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
 
         return transCount / pointsLen;
     };
-
 
     /**
      * 根据手指触摸坐标获得覆盖了的统计点的大致范围，用来减少计算次数 //TODO

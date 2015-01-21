@@ -37,7 +37,7 @@ Orientation会持续的取得移动设备的alpha, beta, gamma的值。
 
 配置项        | 描述                                     | 默认值
 ------------- | -----------------------------------------|-----------
-callback      | (Function) 角度/弧度改变的回调函数       | 0
+callback      | (Function) 角度/弧度改变的回调函数       | -
 alphaThreshold| (number) alpha改变触发回调的临界值       | 0
 betaThreshold | (number) beta 改变触发回调的临界值       | 0
 gammaThreshold| (number) gamma改变触发回调的临界值       | 0
@@ -143,7 +143,10 @@ alpha           | (number) 遮罩的透明度 默认不透明                   
 checkDistance   | (number) 用于计算擦除部分的比例的计算点之间的间距，越小越精确，而执行效率越低  | 20
 showPoint       | (boolean) 显示计算点，一般在测试的时候才用                                     | false
 radius          | (number) 擦除半径大小                                                          | 20
-alphaRadius     | (number) 擦除外边缘半透明渐变距离(注: 在计算擦除面积时只算完全擦除的)          | 10
+alphaRadius     | (number) 擦除外边缘半透明渐变距离(注: 在计算擦除面积时只算完全擦除的部分)      | 10
+eraseWidth      | (number) 擦除宽度(注: 配置该属性即设置擦除的形状为矩形，值为矩形宽度)          | -
+eraseHeight     | (number) 擦除高度                                                              | -
+smooth          | (boolean) 擦除的形状为矩形时有效，是否用椭圆替换矩形，使擦除时边缘更平滑       | true
 
 
 返回值                      | 描述
