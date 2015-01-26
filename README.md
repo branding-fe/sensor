@@ -54,7 +54,7 @@ gamma         | (number) 移动设备左右倾斜的角度/弧度值
 用法:
 ```javascript
 //使用amd js加载工具
-require(['oientation'], function(Orientation) {
+require(['orientation'], function(Orientation) {
     // options为函数时就作为配置项的callback配置项
     new Orientation(function(data){
         //处理data...
