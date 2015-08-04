@@ -1,16 +1,26 @@
 /*******************************************************************************
 *     File Name           :     src/erasePM25Mask.js
 *     Created By          :     DestinyXie
-*     Creation Date       :     [2014-11-18 13:46]
-*     Last Modified       :     [2015-04-03 00:02]
+*     Creation Date       :     [2014-12-26 15:23]
+*     Last Modified       :     [2015-02-28 17:51]
 *     Description         :     Erase pm2.5 mask with erasableMask
 ********************************************************************************/
 
 define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
+    // 在线时间: 3月1日0点 ~ 4月1日0点
+    function checkOnlineTime() {
+        var startTime = new Date('2015/03/01 0:0:0').getTime();
+        var endTime = new Date('2015/04/01 0:0:0').getTime();
+        var nowTime = new Date().getTime();
+        if (nowTime < startTime || nowTime > endTime) {
+            return false;
+        }
+        return true;
+    }
+
     // 加载百度统计代码
     var genBaiduLog = function(configs) {
         var hm = document.createElement("script");
-        //hm.src = "//hm.baidu.com/hm.js?d7cdf65b6ea89fd0a30a2e7b1fe7448c";
         hm.src = configs.log_src;
         var parent = (document.head || document.getElementsByTagName('head')[0] || document.body);
         parent.insertBefore(hm, parent.firstChild);
@@ -148,7 +158,7 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
     bodyStyle.webkitUserSelect = 'none';
     // 水滴图片
     var waterImg = 'http://bs.baidu.com/public01/bcs-sensor/images/pm2.5/waterdrop.png';
-    var closeImg = 'http://bs.baidu.com/public01/bcs-sensor/images/volvo/icon_delate.png';
+    var closeImg = 'http://bs.baidu.com/public01/bcs-sensor/images/ysld/icon_delate.png';
     var airIndex = 130;
     var airIndexText = '轻度污染';
 
@@ -180,7 +190,7 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
     }
 
 
-    // volvo configs
+    // ysld configs
     // 雾霾配置项
     var configs = {
 
@@ -194,19 +204,19 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         logoDom: 'logo',
 
         // logo图片
-        logoImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/logo50x50.png',
+        logoImage: '//bs.baidu.com/public01/bcs-sensor/examples/ysld2/logo75x40.png',
 
         // logo点击跳转链接地址
-        logoLink: 'http://www.volvocars.com/zh-CN/mobile/experience/Pages/S60L.aspx',
+        logoLink: 'http://crm.sh/ANTIP/mobile/?source=ala',
 
         // logo图片宽度
-        logoWidth: 25,
+        logoWidth: 50,
 
         // logo图片高度
-        logoHeight: 25,
+        logoHeight: 28,
 
         // 雾霾图片  // 320 * 480 80K以内 png
-        maskImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/pm_fog_big.png',
+        maskImage: '//bs.baidu.com/public01/bcs-sensor/examples/ysld2/pm_fog_big.png',
 
         // 遮罩上部位置
         top: 90,
@@ -215,46 +225,47 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         alphaRadius: 10,
 
         // 擦除半径
-        radius: 100,
+        radius: 140,
 
         // 擦除宽度 擦除图片为长方形时配置
-        eraseWidth: 52,
+        eraseWidth: 100,
 
         // 擦除高度 擦除图片为长方形时配置
-        eraseHeight: 122,
+        eraseHeight: 100,
+        useRadius: true,
 
         // 擦除区块逆时针偏转角度 擦除图片为长方形时配置
-        angle: -25,
+        //angle: -25,
 
         // 用于擦除的图片
-        eraseImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/leaf.png',
+        eraseImage: '//bs.baidu.com/public01/bcs-sensor/examples/ysld2/bottle.png',
 
         // 遮盖提示图片
-        coverImg: '//bs.baidu.com/public01/bcs-sensor/images/volvo/pm_tip.png',
+        coverImg: '//bs.baidu.com/public01/bcs-sensor/examples/ysld2/pm_tip.png',
 
         // 雾霾后面垫的图片 // 320 * 200 80K以内 png
-        backgroundImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/in_car2.png',
+        //backgroundImage: '//bs.baidu.com/public01/bcs-sensor/images/volvo/in_car2.png',
 
         // 百度统计链接地址
-        log_src: '//hm.baidu.com/hm.js?b58153b89c1a676666560e865c526068',
+        log_src: '//hm.baidu.com/hm.js?b8191b6b9d02f3ebf517907d4eb8af18',
 
         // 百度统计统计名称
-        log_name: 'wise-pm2.5-volvo-20141128',
+        log_name: 'wise-pm2.5-ysld2-20150228',
 
         // 精算: 显示logo
-        log_logo_show: 'http://click.hm.baidu.com/mkt.gif?ai=818d83661f98417a5c4d2d837e6aa37d&et=0&r=' + new Date().getTime(),
+        log_logo_show: 'http://click.hm.baidu.com/mkt.gif?ai=cf13a4781152fa3553e1292aeed51fda&et=0&r=' + new Date().getTime(),
 
         // 精算: 点击logo
-        log_logo_click: 'http://click.hm.baidu.com/clk?610fb888e544770f8831c89756d39a94',
+        log_logo_click: 'http://click.hm.baidu.com/clk?7793b7a9c19b8469e0c95d630fa9f5bf',
 
         // 精算: 打开浮层
-        log_open: 'http://click.hm.baidu.com/mkt.gif?ai=758bbfbd65209c6b94ef39db5d4a2894&et=0',
+        log_open: 'http://click.hm.baidu.com/mkt.gif?ai=650591cd35f44a5565247e42e8c07c4b&et=0',
 
         // 精算: 用户交互
-        log_start: 'http://click.hm.baidu.com/mkt.gif?ai=172a598cb1c366983c554fe66333ed33&et=0',
+        log_start: 'http://click.hm.baidu.com/mkt.gif?ai=166a39f14ce57b88075d94f398f730ad&et=0',
 
         // localStorage名称用户记录展示之后不再展示的截止时间
-        localStorageName: 'search_pm25_volvo_close',
+        localStorageName: 'search_pm25_ysld_close',
 
         // 未点关闭多少个自然天不显示
         not_show_without_close: 1,
@@ -269,6 +280,9 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
 
     var generated = false;
     function generateMask (airIdx, airText, logoDom, maskedDom) {
+        if (!checkOnlineTime()) {
+            return;
+        }
         configs.airIndex = airIdx || configs.airIndex;
         configs.airIndexText = airText || configs.airIndexText;
         configs.logoDom = logoDom || configs.logoDom;
@@ -284,7 +298,7 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
         var logoWidth = configs.logoWidth || 41;
         var logoHeight = configs.logoHeight || 28;
         // 擦除区块逆时针偏转角度 擦除图片为长方形时配置
-        var imgAngle = configs.angle || 45;
+        var imgAngle = configs.angle || 0;
         // 雾霾图片
         var maskImage = configs.maskImage;
         // 遮罩上部位置
@@ -340,8 +354,8 @@ define(['sensor/erasableMask', 'sensor/env'], function(Mask, Env) {
             alpha: getOpacity(airIdx), // 雾霾透明度
             alphaRadius: 10, // 擦除雾霾时的边缘模糊距离
             radius: 80, // 计算擦除半径
-            eraseWidth: 50, // 擦除宽度
-            eraseHeight: 140, // 擦除高度
+            eraseWidth: bottleWidth, // 擦除宽度
+            eraseHeight: bottleHeight, // 擦除高度
             angle: imgAngle, // 擦除区块逆时针偏转角度
             eraseImage: bottleImg, // 用于擦除的瓶子图片
             eraseImageWidth: bottleWidth, // 瓶子宽度

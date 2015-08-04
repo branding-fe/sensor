@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2015-01-21 18:16]
+*     Last Modified       :     [2015-02-26 19:49]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 
@@ -684,7 +684,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
             ctx.beginPath();
 
             // 方
-            if (this._configs.eraseWidth) {
+            if (this._configs.eraseWidth && !this._configs.useRadius) {
                 ctx.fillStyle = '#000';
                 if (this._configs.smooth) {
                     // 使用椭圆，擦除时边缘更平滑
@@ -698,7 +698,7 @@ define(['sensor/util', 'sensor/wave'], function(util, wave) {
                 ctx.fillStyle = '#000';
             }
             // 圆
-            else if (eraseRadius) {
+            else {
                 this.eraseCircle(ctx, x - this._configs.left, y - this._configs.top, eraseRadius,
                         this._configs.alphaRadius);
                 ctx.fillStyle = '#000';
