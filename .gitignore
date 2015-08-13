@@ -1,6 +1,7 @@
 out/
 test/
 build/
+gulp-build/
 node_modules/
 .gitignore
 up.sh

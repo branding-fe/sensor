@@ -5,6 +5,7 @@
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Shake Example</title>
     <script type="text/javascript" src="../src/require.js"></script>
+    <script src="../gulp-build/shake.js"></script>
     <style type="text/css" media="screen">
         html,body {
             padding: 0;
@@ -23,13 +24,7 @@
 <br/>
 摇晃手机变色
 <script type="text/javascript" charset="utf-8">
-require.config({
-    baseUrl: '../src',
-    paths: {
-        sensor: '../src'
-    }
-});
-require(['shake'], function(Shake) {
+require(['shake.js'], function(Shake) {
     var colors = ['#ff0', '#f00', '#00f', '#0f0', '#0ff', '#f0f'];
     var curIdx = 0;
     var shakeEvent = new Shake(function() {
