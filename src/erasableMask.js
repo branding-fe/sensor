@@ -2,7 +2,7 @@
 *     File Name           :     src/erasableMask.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:45]
-*     Last Modified       :     [2015-02-26 19:49]
+*     Last Modified       :     [2015-08-14 19:22]
 *     Description         :     可擦除的遮罩功能
 ********************************************************************************/
 

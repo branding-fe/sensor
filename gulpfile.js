@@ -2,33 +2,46 @@
 *     File Name           :     gulpfile.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2015-08-12 15:21]
-*     Last Modified       :     [2015-08-13 19:15]
+*     Last Modified       :     [2015-08-14 19:49]
 *     Description         :     gulpfile
 ********************************************************************************/
 
 
 var gulp = require('gulp');
 var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
+var gutil = require('gulp-util');
+var chalk = require('chalk');
 var ro = require('gulp-requirejs-optimize');
 
 gulp.task('js-min', function () {
-    gulp.src(['src/**/*.js', '!src/eraseYSLDMask.js'])
-        .pipe(concat('all.js'))
+    return gulp.src(['src/**/*.js', '!src/eraseYSLDMask.js', '!src/require.js'])
         .pipe(uglify())
-        .pipe(gulp.dest('gulp-build'));
+        .pipe(gulp.dest('gulp-min'));
 });
 
-gulp.task('ro', function () {
-    gulp.src(['src/erasableMask.js', 'src/geolocation.js', 'src/orientation.js', 'src/shake.js', 'src/x.js'])
-        .pipe(ro({
+var apis = ['erasableMask', 'geolocation', 'orientation', 'shake'];
+apis.forEach(function (api) {
+    // combine to one file
+    gulp.task(api, function () {
+        var includes = [api];
+        if ('geolocation' === api) {
+            includes.push('x');
+        }
+        var requireConfig = {
             paths: {
                 'sensor': '.'
             }
-        }))
-        .pipe(gulp.dest('gulp-build'));
+            ,name: 'almond'
+            ,include: includes
+            // ,optimize: 'none' // debug
+            // ,wrap: true // add function wrapper
+            // ,useSourseUrl: true // source maps, need `optimize: 'none'`
+        };
+        return gulp.src('src/' + api + '.js')
+            .pipe(ro(requireConfig))
+            .pipe(gulp.dest('gulp-build'));
+    });
 });
 
-gulp.task('default', ['js-min', 'ro'], function() {
-    console.log('default done!');
-});
+gulp.task('default', ['js-min']);
+gulp.task('ro', apis);
