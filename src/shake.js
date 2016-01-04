@@ -2,7 +2,8 @@
 *     File Name           :     src/shake.js
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-09-23 10:53]
-*     Last Modified       :     [2015-01-19 12:45]
+*     Last Modified by    :     Ching (xiaqing03@baidu.com)
+*     Last Modified       :     [2016-01-04 10:45]
 *     Description         :     监测移动设备摇晃
 ********************************************************************************/
 
@@ -132,10 +133,13 @@ define(['sensor/util'], function(util) {
                     y: current.y,
                     z: current.z
                 });
-                this._prevAcceleration.x = current.x;
-                this._prevAcceleration.y = current.y;
-                this._prevAcceleration.z = current.z;
             }
+            // 位置应该是实时更新，而不是callback才更新
+            // 会导致一次shake, callback两次
+            // modified by Ching (xiaqing03@baidu.com) 2015-12-31
+            this._prevAcceleration.x = current.x;
+            this._prevAcceleration.y = current.y;
+            this._prevAcceleration.z = current.z;
         }
     };
 
