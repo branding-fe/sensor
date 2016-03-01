@@ -82,7 +82,8 @@ define(['sensor/util'], function(util) {
         }
     };
 
-    /** 停止检测手机加速度
+    /**
+     * 停止检测手机加速度
      * @return this
      */
     Shake.prototype.stop = function () {

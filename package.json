@@ -5,13 +5,11 @@
     "url": "https://github.com/branding-fe/sensor.git"
   },
   "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-build-requirejs": "^0.1.2-rc7",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-watch": "~0.5.3",
-    "load-grunt-tasks": "~0.2.0",
-    "requirejs": "~2.1.14",
-    "time-grunt": "~0.2.0"
+    "chalk": "^1.1.0",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-requirejs-optimize": "^0.2.0",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.6",
   }
 }

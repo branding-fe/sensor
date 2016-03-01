@@ -2,7 +2,7 @@
 *     File Name           :     erasableMask.html
 *     Created By          :     DestinyXie
 *     Creation Date       :     [2014-10-21 15:50]
-*     Last Modified       :     [2015-01-15 19:50]
+*     Last Modified       :     [2015-08-14 19:22]
 *     Description         :     rub part of mask
 *******************************************************************************-->
 
@@ -12,7 +12,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Erasable Mask</title>
-    <script type="text/javascript" src="../src/require.js"></script>
+    <script src="../gulp-build/erasableMask.js"></script>
     <style>
     #outerWrap {
         position: absolute;
@@ -45,13 +45,7 @@
 </div>
 </div>
 <script>
-require.config({
-    baseUrl: '../src',
-    paths: {
-        sensor: '../src'
-    }
-});
-require(['sensor/erasableMask'], function(Mask) {
+require(['erasableMask'], function(Mask) {
     var bodyStyle = document.body.style;
     bodyStyle.mozUserSelect = 'none';
     bodyStyle.webkitUserSelect = 'none';
@@ -80,7 +74,7 @@ require(['sensor/erasableMask'], function(Mask) {
         }
     });
     mask.start();
-})();
+});
 </script>
 </body>
 </html>

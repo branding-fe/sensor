@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
     <title>Orientation Example</title>
-    <script type="text/javascript" src="../src/require.js"></script>
+    <script type="text/javascript" src="../gulp-build/orientation.js"></script>
     <style type="text/css" media="screen">
         * {
     -webkit-user-select: none;
@@ -23,12 +23,6 @@
 <body>
 <canvas id="ball">Your browser does not support the HTML5 canvas tag.</canvas>
 <script type="text/javascript" charset="utf-8">
-require.config({
-    baseUrl: '../src',
-    paths: {
-        sensor: '../src'
-    }
-});
 require(['orientation'], function(Orientation) {
     var sense,
         c = document.getElementById('ball'),
